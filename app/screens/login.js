@@ -21,7 +21,6 @@ class Login extends Component {
     super(props);
     this.state = {
       error: '',
-      retry: false
     };
   }
 
@@ -29,13 +28,13 @@ class Login extends Component {
     Spotify.login().then((logged) => {
       if (logged) {
         Spotify.getMe().then((user) => {
+          console.log(user);
           if (user.product === 'premium') {
             Spotify.getAuthAsync().then((auth) => {
-              this.props.auth(auth.accessToken).then((response) => {
-                if (response.stack && this.state.retry) {
-                  this.state({ retry: true });
-                  this.login();
-                } else if (response.accessToken) {
+              console.log(auth);
+              this.props.auth(auth.accessToken, user).then((response) => {
+                console.log(response);
+                /* if (response.accessToken) {
                   this.props.fetchUser(user.email).then((result) => {
                     if (result.data[0]) {
                       this.props.navigation.navigate('App');
@@ -43,7 +42,7 @@ class Login extends Component {
                       Alert.alert('Erro', 'Não foi possivel fazer login com esse email.');
                     }
                   });
-                }
+                } */
               });
             });
           } else {
@@ -54,7 +53,7 @@ class Login extends Component {
         this.setState({ error: 'Login Cancelado' });
       }
     }).catch((error) => {
-      this.setState({ error });
+      console.log(error);
     });
   }
 
@@ -87,8 +86,8 @@ const LoginConnector = connect(state => (
   }
 ), dispatch => (
   {
-    auth: token => (
-      dispatch(authAction(token))
+    auth: (token, credentials) => (
+      dispatch(authAction(token, credentials))
     ),
     fetchUser: email => (
       dispatch(fetchUserAction(email))

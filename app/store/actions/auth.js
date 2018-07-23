@@ -74,13 +74,14 @@ const checkToken = () => (
   }
 );
 
-const auth = token => (
+const auth = (token, credentials) => (
   (dispatch) => {
     dispatch(requestToken());
 
     return api.auth({
       strategy: 'spotify',
       accessToken: token,
+      ...credentials,
     }).then(() => api.auth())
       .catch((error) => {
         dispatch(receiveToken('', false));

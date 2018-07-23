@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import Spotify from 'rn-spotify-sdk';
 
 import actions from '../store/actions';
 
@@ -14,6 +15,10 @@ const {
 } = actions;
 
 class Home extends Component {
+  componentDidMount() {
+    
+  }
+
   render() {
     return (
       <View>

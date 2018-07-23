@@ -12,7 +12,10 @@ import Spotify from 'rn-spotify-sdk';
 
 import actions from '../store/actions';
 
-const { checkToken: checkTokenAction } = actions;
+const {
+  checkToken: checkTokenAction,
+  checkSptToken: checkSptTokenAction,
+} = actions;
 
 class Loading extends Component {
   componentDidMount() {
@@ -20,6 +23,8 @@ class Loading extends Component {
       clientID: '84f3966b6522451686c303f5900fc12b',
       sessionUserDefaultsKey: 'SpotifySession',
       redirectURL: 'juxerhost://auth',
+      tokenSwapURL: 'http://10.0.1.50:3000/swap',
+      tokenRefreshURL: 'http://10.0.1.50:3000/refresh',
       scopes: ['user-read-private', 'user-read-email', 'playlist-read', 'playlist-read-private', 'streaming'],
     };
 
@@ -28,12 +33,18 @@ class Loading extends Component {
       Spotify.initialize(spotifyOptions),
     ]).then((response) => {
       console.log(response);
-      if (response[0].code === 401) {
+      if (!response[1] || response[0].code === 401) {
         this.props.navigation.navigate('Auth');
-      } else if (response[1]) {
-        this.props.navigation.navigate('App');
       }
-      this.props.navigation.navigate('Auth');
+      this.props.checkSptToken().then((result) => {
+        if (result.refreshToken) {
+          this.props.navigation.navigate('App');
+        } else {
+          this.props.navigation.navigate('Auth');
+        }
+      }, () => {
+        this.props.navigation.navigate('Auth');
+      });
     }).catch((error) => {
       console.log(error);
       this.props.navigation.navigate('Auth');
@@ -68,6 +79,7 @@ const styles = StyleSheet.create({
 
 Loading.propTypes = {
   checkToken: PropTypes.func.isRequired,
+  checkSptToken: PropTypes.func.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
@@ -80,6 +92,9 @@ const LoadingConnector = connect(() => (
   {
     checkToken: () => (
       dispatch(checkTokenAction())
+    ),
+    checkSptToken: () => (
+      dispatch(checkSptTokenAction())
     ),
   }
 ))(Loading);
