@@ -3,12 +3,10 @@ import {
   StyleSheet,
   View,
   Button,
-  FlatList,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import Playlist from '../components/playlist';
 import actions from '../store/actions';
 
 const {
@@ -17,46 +15,21 @@ const {
   fetchSptPlaylists: fetchSptPlaylistsAction,
 } = actions;
 
-class Home extends Component {
-  static navigationOptions = ({ navigation }) => ({
-    title: 'Juxer',
-    headerRight: (
-      <Button
-        onPress={() => navigation.navigate('Event')}
-        title="Criar Evento"
-      />
-    ),
+class Event extends Component {
+  static navigationOptions = () => ({
+    title: 'Novo Evento',
   });
 
   componentDidMount() {
-    this.props.fetchSptPlaylists();
   }
 
   render() {
     return (
       <View>
-        <FlatList
-          style={styles.playlists}
-          data={this.props.playlists.data}
-          renderItem={({ item }) => (
-            <Playlist
-              name={item.name}
-              qty={item.tracks.total.toString()}
-              image={item.images[0].url}
-            />
-          )}
-          keyExtractor={item => item.id}
-          horizontal
-        />
         <Button
           title="logout"
           onPress={() => {
-            Promise.all([
-              this.props.logout(),
-              this.props.sptLogout(),
-            ]).then(() => {
-              this.props.navigation.navigate('Loading');
-            });
+            
           }}
         />
       </View>
@@ -64,7 +37,7 @@ class Home extends Component {
   }
 }
 
-Home.propTypes = {
+Event.propTypes = {
   playlists: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
   }).isRequired,
@@ -84,7 +57,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const HomeConnector = connect(state => (
+const EventConnector = connect(state => (
   {
     playlists: state.spotify.playlists,
   }
@@ -100,6 +73,6 @@ const HomeConnector = connect(state => (
       dispatch(fetchSptPlaylistsAction())
     ),
   }
-))(Home);
+))(Event);
 
-export default HomeConnector;
+export default EventConnector;

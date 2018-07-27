@@ -39,13 +39,13 @@ const fetchUser = credentials => (
 
     return api.users.find({ query: { email: credentials.email } })
       .then((response) => {
-        if (response.data.lenght === 1) {
+        if (response.data.length === 1) {
           dispatch(receiveUser(response.data[0]));
           return response;
         }
-        if (response.data.lenght === 0) {
+        if (response.data.length === 0) {
           return api.users.create({ ...credentials }).then((result) => {
-            dispatch(receiveUser(result.data[0]));
+            dispatch(receiveUser(result));
             return result;
           }, (error) => {
             dispatch(receiveUser({}));
@@ -74,14 +74,13 @@ const checkToken = () => (
   }
 );
 
-const auth = (token, credentials) => (
+const auth = token => (
   (dispatch) => {
     dispatch(requestToken());
 
     return api.auth({
       strategy: 'spotify',
       accessToken: token,
-      ...credentials,
     }).then(() => api.auth())
       .catch((error) => {
         dispatch(receiveToken('', false));

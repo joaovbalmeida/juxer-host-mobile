@@ -35,16 +35,13 @@ class Loading extends Component {
       console.log(response);
       if (!response[1] || response[0].code === 401) {
         this.props.navigation.navigate('Auth');
-      }
-      this.props.checkSptToken().then((result) => {
-        if (result.refreshToken) {
-          this.props.navigation.navigate('App');
-        } else {
+      } else {
+        this.props.checkSptToken().then((result) => {
+          this.props.navigation.navigate(result.refreshToken ? 'App' : 'Auth');
+        }, () => {
           this.props.navigation.navigate('Auth');
-        }
-      }, () => {
-        this.props.navigation.navigate('Auth');
-      });
+        });
+      }
     }).catch((error) => {
       console.log(error);
       this.props.navigation.navigate('Auth');

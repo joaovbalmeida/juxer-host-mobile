@@ -1,23 +1,13 @@
 const initialState = {
-  authenticated: false,
-  token: {
-    isFetching: false,
-    lastUpdated: '',
-    data: '',
-  },
-  user: {
-    isFetching: false,
-    lastUpdated: '',
-    data: {},
-  },
-  playlists: {
+  index: 0,
+  queue: {
     isFetching: false,
     lastUpdated: '',
     data: [],
   },
 };
 
-const sptAuth = (state = initialState, action) => {
+const queue = (state = initialState, action) => {
   switch (action.type) {
     case 'REQUEST_SPT_USER':
       return Object.assign({}, state, {
@@ -89,4 +79,4 @@ const sptAuth = (state = initialState, action) => {
   }
 };
 
-export default sptAuth;
+export default queue;

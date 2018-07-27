@@ -14,6 +14,8 @@ import actions from '../store/actions';
 const {
   auth: authAction,
   fetchUser: fetchUserAction,
+  fetchSptUser: fetchSptUserAction,
+  sptAuth: sptAuthAction,
 } = actions;
 
 class Login extends Component {
@@ -25,32 +27,29 @@ class Login extends Component {
   }
 
   login() {
-    Spotify.login().then((logged) => {
-      if (logged) {
-        Spotify.getMe().then((user) => {
-          console.log(user);
+    this.props.sptAuth().then((result) => {
+      if (result.refreshToken) {
+        this.props.fetchSptUser().then((user) => {
           if (user.product === 'premium') {
-            Spotify.getAuthAsync().then((auth) => {
-              console.log(auth);
-              this.props.auth(auth.accessToken, user).then((response) => {
-                console.log(response);
-                /* if (response.accessToken) {
-                  this.props.fetchUser(user.email).then((result) => {
-                    if (result.data[0]) {
-                      this.props.navigation.navigate('App');
-                    } else {
-                      Alert.alert('Erro', 'Não foi possivel fazer login com esse email.');
-                    }
-                  });
-                } */
-              });
+            this.props.auth().then((response) => {
+              if (response.accessToken) {
+                const credentials = {
+                  email: user.email,
+                  name: user.display_name,
+                  picture: user.images.length ? user.images[0].url : null,
+                  spotifyId: user.id,
+                };
+                this.props.fetchUser(credentials).then((data) => {
+                  if (data.createdAt || data.data.length) {
+                    this.props.navigation.navigate('App');
+                  } else {
+                    Alert.alert('Erro', 'Não foi possivel fazer login com esse email.');
+                  }
+                });
+              }
             });
-          } else {
-            Alert.alert('Ops', 'Sua conta precisa ser Premium para usar nosso serviço');
           }
         });
-      } else {
-        this.setState({ error: 'Login Cancelado' });
       }
     }).catch((error) => {
       console.log(error);
@@ -74,23 +73,30 @@ class Login extends Component {
 
 Login.propTypes = {
   auth: PropTypes.func.isRequired,
+  sptAuth: PropTypes.func.isRequired,
   fetchUser: PropTypes.func.isRequired,
+  fetchSptUser: PropTypes.func.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
 };
 
-const LoginConnector = connect(state => (
+const LoginConnector = connect(() => (
   {
-    auth: state.auth.authenticated,
   }
 ), dispatch => (
   {
-    auth: (token, credentials) => (
-      dispatch(authAction(token, credentials))
+    auth: token => (
+      dispatch(authAction(token))
+    ),
+    sptAuth: () => (
+      dispatch(sptAuthAction())
     ),
     fetchUser: email => (
       dispatch(fetchUserAction(email))
+    ),
+    fetchSptUser: () => (
+      dispatch(fetchSptUserAction())
     ),
   }
 ))(Login);
