@@ -3,21 +3,43 @@ import {
   Text,
   Image,
   StyleSheet,
-  View,
+  TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import PropTypes from 'prop-types';
+
+import tickIcon from '../assets/images/tick.png';
 
 const Playlist = ({
   name,
   qty,
   image,
+  onPress,
+  selected,
+  disabled,
 }) => (
-  <View style={styles.container}>
-    <Image
+  <TouchableOpacity
+    style={styles.container}
+    onPress={onPress}
+    disabled={disabled}
+  >
+    <ImageBackground
       style={styles.image}
       resizeMode="contain"
       source={{ uri: image }}
-    />
+    >
+      {
+        selected
+          ? (
+            <ImageBackground style={styles.imageSelected}>
+              <Image
+                style={{ height: 50, width: 50 }}
+                source={tickIcon}
+              />
+            </ImageBackground>
+          ) : null
+      }
+    </ImageBackground>
     <Text>
       {name}
     </Text>
@@ -25,13 +47,22 @@ const Playlist = ({
       {`${qty} `}
       Músicas
     </Text>
-  </View>
+  </TouchableOpacity>
 );
 
 Playlist.propTypes = {
   name: PropTypes.string.isRequired,
   qty: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired,
+  selected: PropTypes.bool,
+  disabled: PropTypes.bool,
+  onPress: PropTypes.func,
+};
+
+Playlist.defaultProps = {
+  selected: false,
+  disabled: false,
+  onPress: () => {},
 };
 
 const styles = StyleSheet.create({
@@ -44,6 +75,13 @@ const styles = StyleSheet.create({
   image: {
     height: 150,
     width: 150,
+  },
+  imageSelected: {
+    height: 150,
+    width: 150,
+    backgroundColor: 'rgba(0,0,0,.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
