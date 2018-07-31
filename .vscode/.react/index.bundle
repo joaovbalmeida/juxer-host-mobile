@@ -58909,7 +58909,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   };
 
   exports.default = App;
-},489,[109,490,512,524,12,525,740],"juxerhost/App.js");
+},489,[109,490,512,524,12,525,746],"juxerhost/App.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   'use strict';
 
@@ -61624,7 +61624,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   }, {
     initialRouteName: 'Loading'
   });
-},525,[526,644,735,739],"juxerhost/app/routes/index.js");
+},525,[526,644,735,745],"juxerhost/app/routes/index.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = {
     get createNavigationContainer() {
@@ -81096,13 +81096,13 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _spotify2 = _interopRequireDefault(_spotify);
 
-  var _queue = require(_dependencyMap[2], "./queue");
+  var _event = require(_dependencyMap[2], "./event");
 
-  var _queue2 = _interopRequireDefault(_queue);
+  var _event2 = _interopRequireDefault(_event);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  exports.default = _extends({}, _auth2.default, _spotify2.default, _queue2.default);
+  exports.default = _extends({}, _auth2.default, _spotify2.default, _event2.default);
 },651,[652,733,734],"juxerhost/app/store/actions/index.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
@@ -81268,7 +81268,9 @@ __d(function (global, require, module, exports, _dependencyMap) {
   exports.default = {
     auth: feathersClient.authenticate,
     logout: feathersClient.logout,
-    users: feathersClient.service('users')
+    users: feathersClient.service('users'),
+    playlists: feathersClient.service('playlists'),
+    events: feathersClient.service('events')
   };
 },653,[654,669,677,689,12],"juxerhost/app/api.js");
 __d(function (global, require, module, exports, _dependencyMap) {
@@ -89582,46 +89584,156 @@ __d(function (global, require, module, exports, _dependencyMap) {
     value: true
   });
 
-  var _rnSpotifySdk = require(_dependencyMap[0], "rn-spotify-sdk");
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-  var _rnSpotifySdk2 = _interopRequireDefault(_rnSpotifySdk);
+  var _api = require(_dependencyMap[0], "../../api");
+
+  var _api2 = _interopRequireDefault(_api);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  var requestSptAuth = function requestSptAuth() {
+  function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+  var requestEvent = function requestEvent() {
     return {
-      type: 'REQUEST_SPT_AUTH'
+      type: 'REQUEST_EVENT'
     };
   };
 
-  var receiveSptAuth = function receiveSptAuth(auth, fetching) {
+  var receiveEvent = function receiveEvent(event) {
     return {
-      type: 'RECEIVE_SPT_AUTH',
-      auth: auth,
-      fetching: fetching
+      type: 'RECEIVE_EVENT',
+      event: event
     };
   };
 
-  var fetchSptPlaylists = function fetchSptPlaylists() {
+  var resetEvent = function resetEvent() {
+    return {
+      type: 'RESET_EVENT'
+    };
+  };
+
+  var requestUserEvents = function requestUserEvents() {
+    return {
+      type: 'REQUEST_USER_EVENTS'
+    };
+  };
+
+  var receiveUserEvents = function receiveUserEvents(events) {
+    return {
+      type: 'RECEIVE_USER_EVENTS',
+      events: events
+    };
+  };
+
+  var resetUserEvents = function resetUserEvents() {
+    return {
+      type: 'RESET_USER_EVENTS'
+    };
+  };
+
+  var createEvent = function createEvent(event) {
     return function (dispatch) {
-      dispatch(requestSptPlaylists());
-      return _rnSpotifySdk2.default.sendRequest('v1/me/playlists', 'GET', {
-        limit: 50
-      }, true).then(function (response) {
-        dispatch(receiveSptPlaylists(response.items));
+      dispatch(requestEvent());
+      var playlists = [].concat(_toConsumableArray(event.playlists.map(function (item) {
+        var playlist = {
+          url: item.url,
+          startDate: item.startDate,
+          endDate: item.endDate
+        };
+        var id = '';
+        createPlaylist(playlist).then(function (result) {
+          id = "" + result._id;
+        });
+        console.log(id);
+        return id;
+      })));
+      console.log(playlists);
+
+      if (playlists.includes('')) {
+        dispatch(receiveEvent('', false));
+        return null;
+      }
+
+      return _api2.default.events.create({
+        name: event.name,
+        secret: event.secret,
+        user: event.user,
+        playlists: playlists
+      }).then(function (response) {
+        console.log(response);
         return response;
-      }, function (error) {
-        dispatch(receiveSptPlaylists({}));
+      }, function (erro) {
+        console.log(erro);
+        dispatch(receiveEvent('', false));
         return error;
       });
     };
   };
 
-  exports.default = {
-    receiveSptAuth: receiveSptAuth,
-    requestSptAuth: requestSptAuth
+  var fetchUserEvents = function fetchUserEvents(user) {
+    return function (dispatch) {
+      dispatch(requestUserEvents());
+      return _api2.default.events.find({
+        query: {
+          email: user
+        }
+      }).then(function (response) {
+        console.log(response);
+        return response;
+      }, function (error) {
+        dispatch(receiveUserEvents('', false));
+        return error;
+      });
+    };
   };
-},734,[646],"juxerhost/app/store/actions/queue.js");
+
+  var fetchEvent = function fetchEvent(id) {
+    return function (dispatch) {
+      dispatch(requestEvent());
+      return _api2.default.event.find({
+        query: {
+          _id: id
+        }
+      }).then(function (response) {
+        console.log(response);
+        return response;
+      }, function (error) {
+        dispatch(receiveEvent('', false));
+        return error;
+      });
+    };
+  };
+
+  var createPlaylist = function createPlaylist(playlist) {
+    return _api2.default.playlists.create(_extends({}, playlist)).then(function (response) {
+      return response;
+    }, function (error) {
+      return error;
+    });
+  };
+
+  var fetchPlaylist = function fetchPlaylist(id) {
+    return _api2.default.event.find({
+      query: {
+        _id: id
+      }
+    }).then(function (response) {
+      console.log(response);
+      return response;
+    }, function (error) {
+      return error;
+    });
+  };
+
+  exports.default = {
+    fetchUserEvents: fetchUserEvents,
+    resetUserEvents: resetUserEvents,
+    fetchEvent: fetchEvent,
+    resetEvent: resetEvent,
+    createEvent: createEvent
+  };
+},734,[653],"juxerhost/app/store/actions/event.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -89651,7 +89763,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     initialRouteName: 'Home'
   });
   exports.default = AppStack;
-},735,[526,736,738,749],"juxerhost/app/routes/app.js");
+},735,[526,736,739,740],"juxerhost/app/routes/app.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -89976,7 +90088,19 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Playlist;
-},737,[109,12,292,748],"juxerhost/app/components/playlist.js");
+},737,[109,12,292,738],"juxerhost/app/components/playlist.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 32,
+    "height": 32,
+    "scales": [1],
+    "hash": "598e8941fad446842d5a79eb5a3e9a02",
+    "name": "tick",
+    "type": "png"
+  });
+},738,[325],"app/assets/images/tick.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -90216,560 +90340,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Event);
   exports.default = EventConnector;
-},738,[109,128,12,490,292,737,651],"juxerhost/app/screens/event.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _react2 = require(_dependencyMap[0], "react");
-
-  var _react3 = _interopRequireDefault(_react2);
-
-  var _index = require(_dependencyMap[1], "./../../node_modules/react-transform-hmr/lib/index.js");
-
-  var _index2 = _interopRequireDefault(_index);
-
-  var _jsxFileName = "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/screens/loading.js";
-
-  var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-  var _reactNative = require(_dependencyMap[2], "react-native");
-
-  var _reactRedux = require(_dependencyMap[3], "react-redux");
-
-  var _propTypes = require(_dependencyMap[4], "prop-types");
-
-  var _propTypes2 = _interopRequireDefault(_propTypes);
-
-  var _rnSpotifySdk = require(_dependencyMap[5], "rn-spotify-sdk");
-
-  var _rnSpotifySdk2 = _interopRequireDefault(_rnSpotifySdk);
-
-  var _actions = require(_dependencyMap[6], "../store/actions");
-
-  var _actions2 = _interopRequireDefault(_actions);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-  function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-  function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-  var _components = {
-    Loading: {
-      displayName: "Loading"
-    }
-  };
-
-  var _node_modulesReactTransformHmrLibIndexJs2 = (0, _index2.default)({
-    filename: "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/screens/loading.js",
-    components: _components,
-    locals: [module],
-    imports: [_react3.default]
-  });
-
-  function _wrapComponent(id) {
-    return function (Component) {
-      return _node_modulesReactTransformHmrLibIndexJs2(Component, id);
-    };
-  }
-
-  var checkTokenAction = _actions2.default.checkToken,
-      checkSptTokenAction = _actions2.default.checkSptToken;
-
-  var Loading = _wrapComponent("Loading")(function (_Component) {
-    _inherits(Loading, _Component);
-
-    function Loading() {
-      _classCallCheck(this, Loading);
-
-      return _possibleConstructorReturn(this, (Loading.__proto__ || Object.getPrototypeOf(Loading)).apply(this, arguments));
-    }
-
-    _createClass(Loading, [{
-      key: "componentDidMount",
-      value: function componentDidMount() {
-        var _this2 = this;
-
-        var spotifyOptions = {
-          clientID: '84f3966b6522451686c303f5900fc12b',
-          sessionUserDefaultsKey: 'SpotifySession',
-          redirectURL: 'juxerhost://auth',
-          tokenSwapURL: 'http://10.0.1.50:3000/swap',
-          tokenRefreshURL: 'http://10.0.1.50:3000/refresh',
-          scopes: ['user-read-private', 'user-read-email', 'playlist-read', 'playlist-read-private', 'streaming']
-        };
-        Promise.all([this.props.checkToken(), _rnSpotifySdk2.default.initialize(spotifyOptions)]).then(function (response) {
-          console.log(response);
-
-          if (!response[1] || response[0].code === 401) {
-            _this2.props.navigation.navigate('Auth');
-          } else {
-            _this2.props.checkSptToken().then(function (result) {
-              _this2.props.navigation.navigate(result.refreshToken ? 'App' : 'Auth');
-            }, function () {
-              _this2.props.navigation.navigate('Auth');
-            });
-          }
-        }).catch(function (error) {
-          console.log(error);
-
-          _this2.props.navigation.navigate('Auth');
-        });
-      }
-    }, {
-      key: "render",
-      value: function render() {
-        return _react3.default.createElement(
-          _reactNative.View,
-          {
-            style: styles.container,
-            __source: {
-              fileName: _jsxFileName,
-              lineNumber: 53
-            }
-          },
-          _react3.default.createElement(
-            _reactNative.Text,
-            {
-              style: styles.welcome,
-              __source: {
-                fileName: _jsxFileName,
-                lineNumber: 54
-              }
-            },
-            "Welcome to Juxer"
-          ),
-          _react3.default.createElement(_reactNative.ActivityIndicator, {
-            __source: {
-              fileName: _jsxFileName,
-              lineNumber: 57
-            }
-          })
-        );
-      }
-    }]);
-
-    return Loading;
-  }(_react2.Component));
-
-  var styles = _reactNative.StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#F5FCFF'
-    },
-    welcome: {
-      fontSize: 20,
-      textAlign: 'center',
-      margin: 10
-    }
-  });
-
-  Loading.propTypes = {
-    checkToken: _propTypes2.default.func.isRequired,
-    checkSptToken: _propTypes2.default.func.isRequired,
-    navigation: _propTypes2.default.shape({
-      navigate: _propTypes2.default.func.isRequired
-    }).isRequired
-  };
-  var LoadingConnector = (0, _reactRedux.connect)(function () {
-    return {};
-  }, function (dispatch) {
-    return {
-      checkToken: function checkToken() {
-        return dispatch(checkTokenAction());
-      },
-      checkSptToken: function checkSptToken() {
-        return dispatch(checkSptTokenAction());
-      }
-    };
-  })(Loading);
-  exports.default = LoadingConnector;
-},739,[109,128,12,490,292,646,651],"juxerhost/app/screens/loading.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _redux = require(_dependencyMap[0], "redux");
-
-  var _reduxThunk = require(_dependencyMap[1], "redux-thunk");
-
-  var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
-
-  var _storage = require(_dependencyMap[2], "redux-persist/lib/storage");
-
-  var _storage2 = _interopRequireDefault(_storage);
-
-  var _reduxPersist = require(_dependencyMap[3], "redux-persist");
-
-  var _reducers = require(_dependencyMap[4], "./reducers");
-
-  var _reducers2 = _interopRequireDefault(_reducers);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-  var persistConfig = {
-    key: 'root',
-    storage: _storage2.default
-  };
-  var reducer = (0, _reduxPersist.persistCombineReducers)(persistConfig, _reducers2.default);
-  var store = (0, _redux.createStore)(reducer, (0, _redux.applyMiddleware)(_reduxThunk2.default));
-  exports.default = store;
-},740,[501,741,742,512,743],"juxerhost/app/store/index.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  'use strict';
-
-  exports.__esModule = true;
-
-  function createThunkMiddleware(extraArgument) {
-    return function (_ref) {
-      var dispatch = _ref.dispatch,
-          getState = _ref.getState;
-      return function (next) {
-        return function (action) {
-          if (typeof action === 'function') {
-            return action(dispatch, getState, extraArgument);
-          }
-
-          return next(action);
-        };
-      };
-    };
-  }
-
-  var thunk = createThunkMiddleware();
-  thunk.withExtraArgument = createThunkMiddleware;
-  exports['default'] = thunk;
-},741,[],"redux-thunk/lib/index.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  'use strict';
-
-  exports.__esModule = true;
-
-  var _reactNative = require(_dependencyMap[0], 'react-native');
-
-  exports.default = _reactNative.AsyncStorage;
-},742,[12],"redux-persist/lib/storage/index.native.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _auth = require(_dependencyMap[0], "./auth");
-
-  var _auth2 = _interopRequireDefault(_auth);
-
-  var _spotify = require(_dependencyMap[1], "./spotify");
-
-  var _spotify2 = _interopRequireDefault(_spotify);
-
-  var _queue = require(_dependencyMap[2], "./queue");
-
-  var _queue2 = _interopRequireDefault(_queue);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-  var store = {
-    auth: _auth2.default,
-    spotify: _spotify2.default,
-    queue: _queue2.default
-  };
-  exports.default = store;
-},743,[744,745,746],"juxerhost/app/store/reducers/index.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var initialState = {
-    authenticated: false,
-    token: {
-      isFetching: false,
-      lastUpdated: '',
-      data: ''
-    },
-    user: {
-      isFetching: false,
-      lastUpdated: '',
-      data: {}
-    }
-  };
-
-  var auth = function auth() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-    var action = arguments[1];
-
-    switch (action.type) {
-      case 'REQUEST_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: true,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'RECEIVE_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.user
-          }
-        });
-
-      case 'RESET_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_TOKEN':
-        return _extends({}, state, {
-          token: {
-            data: '',
-            isFetching: true,
-            lastUpdated: ''
-          },
-          authenticated: false
-        });
-
-      case 'RECEIVE_TOKEN':
-        return _extends({}, state, {
-          token: {
-            data: action.token,
-            isFetching: false,
-            lastUpdated: Date.now()
-          },
-          authenticated: action.auth
-        });
-
-      default:
-        return state;
-    }
-  };
-
-  exports.default = auth;
-},744,[],"juxerhost/app/store/reducers/auth.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var initialState = {
-    authenticated: false,
-    token: {
-      isFetching: false,
-      lastUpdated: '',
-      data: ''
-    },
-    user: {
-      isFetching: false,
-      lastUpdated: '',
-      data: {}
-    },
-    playlists: {
-      isFetching: false,
-      lastUpdated: '',
-      data: []
-    }
-  };
-
-  var sptAuth = function sptAuth() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-    var action = arguments[1];
-
-    switch (action.type) {
-      case 'REQUEST_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: true,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_SPT_PLAYLISTS':
-        return _extends({}, state, {
-          playlists: {
-            isFetching: true,
-            lastUpdated: '',
-            data: []
-          }
-        });
-
-      case 'RECEIVE_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.user
-          }
-        });
-
-      case 'RECEIVE_SPT_PLAYLISTS':
-        return _extends({}, state, {
-          playlists: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.playlists
-          }
-        });
-
-      case 'RESET_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_SPT_AUTH':
-        return _extends({}, state, {
-          token: {
-            data: '',
-            isFetching: true,
-            lastUpdated: ''
-          },
-          authenticated: false
-        });
-
-      case 'RECEIVE_SPT_AUTH':
-        return _extends({}, state, {
-          token: {
-            data: action.auth,
-            isFetching: false,
-            lastUpdated: Date.now()
-          },
-          authenticated: true
-        });
-
-      default:
-        return state;
-    }
-  };
-
-  exports.default = sptAuth;
-},745,[],"juxerhost/app/store/reducers/spotify.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var initialState = {
-    index: 0,
-    queue: {
-      isFetching: false,
-      lastUpdated: '',
-      data: []
-    }
-  };
-
-  var queue = function queue() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-    var action = arguments[1];
-
-    switch (action.type) {
-      case 'REQUEST_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: true,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_SPT_PLAYLISTS':
-        return _extends({}, state, {
-          playlists: {
-            isFetching: true,
-            lastUpdated: '',
-            data: []
-          }
-        });
-
-      case 'RECEIVE_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.user
-          }
-        });
-
-      case 'RECEIVE_SPT_PLAYLISTS':
-        return _extends({}, state, {
-          playlists: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.playlists
-          }
-        });
-
-      case 'RESET_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_SPT_AUTH':
-        return _extends({}, state, {
-          token: {
-            data: '',
-            isFetching: true,
-            lastUpdated: ''
-          },
-          authenticated: false
-        });
-
-      case 'RECEIVE_SPT_AUTH':
-        return _extends({}, state, {
-          token: {
-            data: action.auth,
-            isFetching: false,
-            lastUpdated: Date.now()
-          },
-          authenticated: true
-        });
-
-      default:
-        return state;
-    }
-  };
-
-  exports.default = queue;
-},746,[],"juxerhost/app/store/reducers/queue.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
-    "__packager_asset": true,
-    "httpServerLocation": "/assets/app/assets/images",
-    "width": 32,
-    "height": 32,
-    "scales": [1],
-    "hash": "598e8941fad446842d5a79eb5a3e9a02",
-    "name": "tick",
-    "type": "png"
-  });
-},748,[325],"app/assets/images/tick.png");
+},739,[109,128,12,490,292,737,651],"juxerhost/app/screens/event.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -90801,11 +90372,15 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _reactNativeDatepicker2 = _interopRequireDefault(_reactNativeDatepicker);
 
-  var _playlist = require(_dependencyMap[6], "../components/playlist");
+  var _moment = require(_dependencyMap[6], "moment");
+
+  var _moment2 = _interopRequireDefault(_moment);
+
+  var _playlist = require(_dependencyMap[7], "../components/playlist");
 
   var _playlist2 = _interopRequireDefault(_playlist);
 
-  var _actions = require(_dependencyMap[7], "../store/actions");
+  var _actions = require(_dependencyMap[8], "../store/actions");
 
   var _actions2 = _interopRequireDefault(_actions);
 
@@ -90838,7 +90413,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   }
 
-  var fetchSptPlaylistsAction = _actions2.default.fetchSptPlaylists;
+  var createEventAction = _actions2.default.createEvent;
 
   var Playlist = _wrapComponent("Playlist")((_temp = _class = function (_Component) {
     _inherits(Playlist, _Component);
@@ -90859,26 +90434,28 @@ __d(function (global, require, module, exports, _dependencyMap) {
         return playlist;
       });
       _this.state = {
-        playlists: playlists,
-        startPicker: false,
-        endPicker: false
+        playlists: playlists
       };
       return _this;
     }
 
     _createClass(Playlist, [{
-      key: "_showPicker",
-      value: function _showPicker() {
-        this.setState({
-          startPicker: true
-        });
-      }
-    }, {
-      key: "_hidePicker",
-      value: function _hidePicker() {
-        this.setState({
-          endPicker: false
-        });
+      key: "initEvent",
+      value: function initEvent() {
+        var playlists = [].concat(_toConsumableArray(this.state.playlists.map(function (item) {
+          return {
+            url: item.url,
+            startDate: (0, _moment2.default)(item.start).toDate(),
+            endDate: (0, _moment2.default)(item.end).toDate()
+          };
+        })));
+        var event = {
+          user: this.props.user._id,
+          name: this.props.navigation.state.params.name,
+          secret: this.props.navigation.state.params.secret,
+          playlists: playlists
+        };
+        this.props.createEvent(event);
       }
     }, {
       key: "render",
@@ -90890,7 +90467,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 56
+              lineNumber: 62
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -90905,7 +90482,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   style: styles.itemContainer,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 61
+                    lineNumber: 67
                   }
                 },
                 _react3.default.createElement(_playlist2.default, {
@@ -90915,7 +90492,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   disabled: true,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 62
+                    lineNumber: 68
                   }
                 }),
                 _react3.default.createElement(
@@ -90924,20 +90501,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     style: styles.rightView,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 68
+                      lineNumber: 74
                     }
                   },
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
-                    style: {
-                      width: 200
-                    },
+                    style: styles.picker,
                     date: _this2.state.playlists[index].start,
                     mode: "datetime",
                     placeholder: "In\xEDcio",
-                    format: "DD-MM-YYYY HH:MM",
-                    minDate: Date(),
+                    minDate: (0, _moment2.default)().toDate(),
                     confirmBtnText: "Confirmar",
                     cancelBtnText: "Cancelar",
+                    is24Hour: true,
                     customStyles: {
                       dateIcon: {
                         position: 'absolute',
@@ -90960,13 +90535,29 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 69
+                      lineNumber: 75
                     }
                   }),
-                  _react3.default.createElement(_reactNative.TextInput, {
-                    placeholder: "Hora de T\xE9rmino",
-                    style: styles.input,
-                    onChangeText: function onChangeText(end) {
+                  _react3.default.createElement(_reactNativeDatepicker2.default, {
+                    style: styles.picker,
+                    date: _this2.state.playlists[index].end,
+                    mode: "datetime",
+                    placeholder: "T\xE9rmino",
+                    minDate: (0, _moment2.default)().toDate(),
+                    confirmBtnText: "Confirmar",
+                    cancelBtnText: "Cancelar",
+                    customStyles: {
+                      dateIcon: {
+                        position: 'absolute',
+                        left: 0,
+                        top: 4,
+                        marginLeft: 0
+                      },
+                      dateInput: {
+                        marginLeft: 36
+                      }
+                    },
+                    onDateChange: function onDateChange(end) {
                       return _this2.setState(function (state) {
                         var playlists = [].concat(_toConsumableArray(state.playlists));
                         playlists[index].end = end;
@@ -90975,10 +90566,9 @@ __d(function (global, require, module, exports, _dependencyMap) {
                         };
                       });
                     },
-                    value: _this2.state.playlists[index].end,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 95
+                      lineNumber: 101
                     }
                   })
                 )
@@ -90989,21 +90579,17 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 57
+              lineNumber: 63
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
             title: "Criar Evento",
             onPress: function onPress() {
-              _this2.props.navigation.navigate('Playlist', {
-                name: _this2.state.name,
-                secret: _this2.state.secret,
-                selected: _this2.state.selected
-              });
+              return _this2.initEvent();
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 110
+              lineNumber: 131
             }
           })
         );
@@ -91018,14 +90604,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
   }, _temp));
 
   Playlist.propTypes = {
+    createEvent: _propTypes2.default.func.isRequired,
     playlists: _propTypes2.default.shape({
       data: _propTypes2.default.arrayOf(_propTypes2.default.shape({
         href: _propTypes2.default.string.isRequired,
         name: _propTypes2.default.string.isRequired,
         images: _propTypes2.default.array.isRequired,
-        tracks: _propTypes2.default.shape({}).isRequired
+        tracks: _propTypes2.default.shape({
+          total: _propTypes2.default.number.isRequired
+        }).isRequired
       }).isRequired).isRequired
     }).isRequired,
+    user: _propTypes2.default.shape({}).isRequired,
     navigation: _propTypes2.default.shape({
       navigate: _propTypes2.default.func.isRequired,
       state: _propTypes2.default.shape({
@@ -91050,10 +90640,13 @@ __d(function (global, require, module, exports, _dependencyMap) {
       width: '100%'
     },
     rightView: {
-      width: '100%',
-      alignSelf: 'stretch'
+      flex: 1,
+      paddingRight: 10,
+      alignItems: 'center',
+      justifyContent: 'space-around',
+      paddingBottom: 50
     },
-    input: {
+    picker: {
       height: 40,
       width: '100%',
       borderColor: 'gray',
@@ -91063,17 +90656,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var PlaylistConnector = (0, _reactRedux.connect)(function (state) {
     return {
-      playlists: state.spotify.playlists
+      playlists: state.spotify.playlists,
+      user: state.auth.user.data
     };
   }, function (dispatch) {
     return {
-      fetchSptPlaylists: function fetchSptPlaylists() {
-        return dispatch(fetchSptPlaylistsAction());
+      createEvent: function createEvent(event) {
+        return dispatch(createEventAction(event));
       }
     };
   })(Playlist);
   exports.default = PlaylistConnector;
-},749,[109,128,12,490,292,750,737,651],"juxerhost/app/screens/playlist.js");
+},740,[109,128,12,490,292,741,743,737,651],"juxerhost/app/screens/playlist.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91777,7 +91371,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     locale: _propTypes2.default.string
   };
   exports.default = DatePicker;
-},750,[109,128,292,12,751,752,753],"react-native-datepicker/datepicker.js");
+},741,[109,128,292,12,742,743,744],"react-native-datepicker/datepicker.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91859,7 +91453,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = style;
-},751,[12],"react-native-datepicker/style.js");
+},742,[12],"react-native-datepicker/style.js");
 __d(function (global, require, module, exports, _dependencyMap) {
     ;
 
@@ -95980,7 +95574,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
         };
         return hooks;
     });
-},752,[],"moment/moment.js");
+},743,[],"moment/moment.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -95992,7 +95586,541 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "date_icon",
     "type": "png"
   });
-},753,[325],"node_modules/react-native-datepicker/date_icon.png");
+},744,[325],"node_modules/react-native-datepicker/date_icon.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _react2 = require(_dependencyMap[0], "react");
+
+  var _react3 = _interopRequireDefault(_react2);
+
+  var _index = require(_dependencyMap[1], "./../../node_modules/react-transform-hmr/lib/index.js");
+
+  var _index2 = _interopRequireDefault(_index);
+
+  var _jsxFileName = "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/screens/loading.js";
+
+  var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+  var _reactNative = require(_dependencyMap[2], "react-native");
+
+  var _reactRedux = require(_dependencyMap[3], "react-redux");
+
+  var _propTypes = require(_dependencyMap[4], "prop-types");
+
+  var _propTypes2 = _interopRequireDefault(_propTypes);
+
+  var _rnSpotifySdk = require(_dependencyMap[5], "rn-spotify-sdk");
+
+  var _rnSpotifySdk2 = _interopRequireDefault(_rnSpotifySdk);
+
+  var _actions = require(_dependencyMap[6], "../store/actions");
+
+  var _actions2 = _interopRequireDefault(_actions);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+  function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+  function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+  var _components = {
+    Loading: {
+      displayName: "Loading"
+    }
+  };
+
+  var _node_modulesReactTransformHmrLibIndexJs2 = (0, _index2.default)({
+    filename: "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/screens/loading.js",
+    components: _components,
+    locals: [module],
+    imports: [_react3.default]
+  });
+
+  function _wrapComponent(id) {
+    return function (Component) {
+      return _node_modulesReactTransformHmrLibIndexJs2(Component, id);
+    };
+  }
+
+  var checkTokenAction = _actions2.default.checkToken,
+      checkSptTokenAction = _actions2.default.checkSptToken;
+
+  var Loading = _wrapComponent("Loading")(function (_Component) {
+    _inherits(Loading, _Component);
+
+    function Loading() {
+      _classCallCheck(this, Loading);
+
+      return _possibleConstructorReturn(this, (Loading.__proto__ || Object.getPrototypeOf(Loading)).apply(this, arguments));
+    }
+
+    _createClass(Loading, [{
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        var _this2 = this;
+
+        var spotifyOptions = {
+          clientID: '84f3966b6522451686c303f5900fc12b',
+          sessionUserDefaultsKey: 'SpotifySession',
+          redirectURL: 'juxerhost://auth',
+          tokenSwapURL: 'http://10.0.1.50:3000/swap',
+          tokenRefreshURL: 'http://10.0.1.50:3000/refresh',
+          scopes: ['user-read-private', 'user-read-email', 'playlist-read', 'playlist-read-private', 'streaming']
+        };
+        Promise.all([this.props.checkToken(), _rnSpotifySdk2.default.initialize(spotifyOptions)]).then(function (response) {
+          console.log(response);
+
+          if (!response[1] || response[0].code === 401) {
+            _this2.props.navigation.navigate('Auth');
+          } else {
+            _this2.props.checkSptToken().then(function (result) {
+              _this2.props.navigation.navigate(result.refreshToken ? 'App' : 'Auth');
+            }, function () {
+              _this2.props.navigation.navigate('Auth');
+            });
+          }
+        }).catch(function (error) {
+          console.log(error);
+
+          _this2.props.navigation.navigate('Auth');
+        });
+      }
+    }, {
+      key: "render",
+      value: function render() {
+        return _react3.default.createElement(
+          _reactNative.View,
+          {
+            style: styles.container,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 53
+            }
+          },
+          _react3.default.createElement(
+            _reactNative.Text,
+            {
+              style: styles.welcome,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 54
+              }
+            },
+            "Welcome to Juxer"
+          ),
+          _react3.default.createElement(_reactNative.ActivityIndicator, {
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 57
+            }
+          })
+        );
+      }
+    }]);
+
+    return Loading;
+  }(_react2.Component));
+
+  var styles = _reactNative.StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#F5FCFF'
+    },
+    welcome: {
+      fontSize: 20,
+      textAlign: 'center',
+      margin: 10
+    }
+  });
+
+  Loading.propTypes = {
+    checkToken: _propTypes2.default.func.isRequired,
+    checkSptToken: _propTypes2.default.func.isRequired,
+    navigation: _propTypes2.default.shape({
+      navigate: _propTypes2.default.func.isRequired
+    }).isRequired
+  };
+  var LoadingConnector = (0, _reactRedux.connect)(function () {
+    return {};
+  }, function (dispatch) {
+    return {
+      checkToken: function checkToken() {
+        return dispatch(checkTokenAction());
+      },
+      checkSptToken: function checkSptToken() {
+        return dispatch(checkSptTokenAction());
+      }
+    };
+  })(Loading);
+  exports.default = LoadingConnector;
+},745,[109,128,12,490,292,646,651],"juxerhost/app/screens/loading.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _redux = require(_dependencyMap[0], "redux");
+
+  var _reduxThunk = require(_dependencyMap[1], "redux-thunk");
+
+  var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
+
+  var _storage = require(_dependencyMap[2], "redux-persist/lib/storage");
+
+  var _storage2 = _interopRequireDefault(_storage);
+
+  var _reduxPersist = require(_dependencyMap[3], "redux-persist");
+
+  var _reducers = require(_dependencyMap[4], "./reducers");
+
+  var _reducers2 = _interopRequireDefault(_reducers);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var persistConfig = {
+    key: 'root',
+    storage: _storage2.default
+  };
+  var reducer = (0, _reduxPersist.persistCombineReducers)(persistConfig, _reducers2.default);
+  var store = (0, _redux.createStore)(reducer, (0, _redux.applyMiddleware)(_reduxThunk2.default));
+  exports.default = store;
+},746,[501,747,748,512,749],"juxerhost/app/store/index.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  'use strict';
+
+  exports.__esModule = true;
+
+  function createThunkMiddleware(extraArgument) {
+    return function (_ref) {
+      var dispatch = _ref.dispatch,
+          getState = _ref.getState;
+      return function (next) {
+        return function (action) {
+          if (typeof action === 'function') {
+            return action(dispatch, getState, extraArgument);
+          }
+
+          return next(action);
+        };
+      };
+    };
+  }
+
+  var thunk = createThunkMiddleware();
+  thunk.withExtraArgument = createThunkMiddleware;
+  exports['default'] = thunk;
+},747,[],"redux-thunk/lib/index.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  'use strict';
+
+  exports.__esModule = true;
+
+  var _reactNative = require(_dependencyMap[0], 'react-native');
+
+  exports.default = _reactNative.AsyncStorage;
+},748,[12],"redux-persist/lib/storage/index.native.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _auth = require(_dependencyMap[0], "./auth");
+
+  var _auth2 = _interopRequireDefault(_auth);
+
+  var _spotify = require(_dependencyMap[1], "./spotify");
+
+  var _spotify2 = _interopRequireDefault(_spotify);
+
+  var _event = require(_dependencyMap[2], "./event");
+
+  var _event2 = _interopRequireDefault(_event);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var store = {
+    auth: _auth2.default,
+    spotify: _spotify2.default,
+    event: _event2.default
+  };
+  exports.default = store;
+},749,[750,751,752],"juxerhost/app/store/reducers/index.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+  var initialState = {
+    authenticated: false,
+    token: {
+      isFetching: false,
+      lastUpdated: '',
+      data: ''
+    },
+    user: {
+      isFetching: false,
+      lastUpdated: '',
+      data: {}
+    }
+  };
+
+  var auth = function auth() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    switch (action.type) {
+      case 'REQUEST_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: true,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'RECEIVE_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.user
+          }
+        });
+
+      case 'RESET_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'REQUEST_TOKEN':
+        return _extends({}, state, {
+          token: {
+            data: '',
+            isFetching: true,
+            lastUpdated: ''
+          },
+          authenticated: false
+        });
+
+      case 'RECEIVE_TOKEN':
+        return _extends({}, state, {
+          token: {
+            data: action.token,
+            isFetching: false,
+            lastUpdated: Date.now()
+          },
+          authenticated: action.auth
+        });
+
+      default:
+        return state;
+    }
+  };
+
+  exports.default = auth;
+},750,[],"juxerhost/app/store/reducers/auth.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+  var initialState = {
+    authenticated: false,
+    token: {
+      isFetching: false,
+      lastUpdated: '',
+      data: ''
+    },
+    user: {
+      isFetching: false,
+      lastUpdated: '',
+      data: {}
+    },
+    playlists: {
+      isFetching: false,
+      lastUpdated: '',
+      data: []
+    }
+  };
+
+  var sptAuth = function sptAuth() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    switch (action.type) {
+      case 'REQUEST_SPT_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: true,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'REQUEST_SPT_PLAYLISTS':
+        return _extends({}, state, {
+          playlists: {
+            isFetching: true,
+            lastUpdated: '',
+            data: []
+          }
+        });
+
+      case 'RECEIVE_SPT_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.user
+          }
+        });
+
+      case 'RECEIVE_SPT_PLAYLISTS':
+        return _extends({}, state, {
+          playlists: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.playlists
+          }
+        });
+
+      case 'RESET_SPT_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'REQUEST_SPT_AUTH':
+        return _extends({}, state, {
+          token: {
+            data: '',
+            isFetching: true,
+            lastUpdated: ''
+          },
+          authenticated: false
+        });
+
+      case 'RECEIVE_SPT_AUTH':
+        return _extends({}, state, {
+          token: {
+            data: action.auth,
+            isFetching: false,
+            lastUpdated: Date.now()
+          },
+          authenticated: true
+        });
+
+      default:
+        return state;
+    }
+  };
+
+  exports.default = sptAuth;
+},751,[],"juxerhost/app/store/reducers/spotify.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+  var initialState = {
+    event: {
+      isFetching: false,
+      lastUpdated: '',
+      data: {}
+    },
+    userEvents: {
+      isFetching: false,
+      lastUpdated: '',
+      data: []
+    }
+  };
+
+  var sptAuth = function sptAuth() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    switch (action.type) {
+      case 'REQUEST_USER_EVENTS':
+        return _extends({}, state, {
+          userEvents: {
+            isFetching: true,
+            lastUpdated: '',
+            data: []
+          }
+        });
+
+      case 'REQUEST_EVENT':
+        return _extends({}, state, {
+          event: {
+            isFetching: true,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'RECEIVE_USER_EVENTS':
+        return _extends({}, state, {
+          userEvents: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.events
+          }
+        });
+
+      case 'RECEIVE_EVENT':
+        return _extends({}, state, {
+          event: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.event
+          }
+        });
+
+      case 'RESET_EVENT':
+        return _extends({}, state, {
+          event: {
+            isFetching: false,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'RESET_USER_EVENTS':
+        return _extends({}, state, {
+          userEvents: {
+            isFetching: false,
+            lastUpdated: '',
+            data: []
+          }
+        });
+
+      default:
+        return state;
+    }
+  };
+
+  exports.default = sptAuth;
+},752,[],"juxerhost/app/store/reducers/event.js");
 require(23);
 require(11);
 //# sourceMappingURL=index.map

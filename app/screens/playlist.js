@@ -2,20 +2,19 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  TextInput,
   Button,
   FlatList,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-native-datepicker';
+import Moment from 'moment';
 
 import PlaylistComponent from '../components/playlist';
 import actions from '../store/actions';
 
-
 const {
-  fetchSptPlaylists: fetchSptPlaylistsAction,
+  createEvent: createEventAction,
 } = actions;
 
 class Playlist extends Component {
@@ -38,17 +37,24 @@ class Playlist extends Component {
 
     this.state = {
       playlists,
-      startPicker: false,
-      endPicker: false,
     };
   }
 
-  _showPicker() {
-    this.setState({ startPicker: true });
-  }
-
-  _hidePicker() {
-    this.setState({ endPicker: false });
+  initEvent() {
+    const playlists = [...this.state.playlists.map(item => (
+      {
+        url: item.url,
+        startDate: Moment(item.start).toDate(),
+        endDate: Moment(item.end).toDate(),
+      }
+    ))];
+    const event = {
+      user: this.props.user._id, // eslint-disable-line
+      name: this.props.navigation.state.params.name,
+      secret: this.props.navigation.state.params.secret,
+      playlists,
+    };
+    this.props.createEvent(event);
   }
 
   render() {
@@ -71,10 +77,10 @@ class Playlist extends Component {
                   date={this.state.playlists[index].start}
                   mode="datetime"
                   placeholder="Início"
-                  format="DD-MM-YYYY HH:MM"
-                  minDate={Date()}
+                  minDate={Moment().toDate()}
                   confirmBtnText="Confirmar"
                   cancelBtnText="Cancelar"
+                  is24Hour
                   customStyles={{
                     dateIcon: {
                       position: 'absolute',
@@ -97,8 +103,7 @@ class Playlist extends Component {
                   date={this.state.playlists[index].end}
                   mode="datetime"
                   placeholder="Término"
-                  format="DD-MM-YYYY HH:MM"
-                  minDate={Date()}
+                  minDate={Moment().toDate()}
                   confirmBtnText="Confirmar"
                   cancelBtnText="Cancelar"
                   customStyles={{
@@ -125,13 +130,7 @@ class Playlist extends Component {
         />
         <Button
           title="Criar Evento"
-          onPress={() => {
-            this.props.navigation.navigate('Playlist', {
-              name: this.state.name,
-              secret: this.state.secret,
-              selected: this.state.selected,
-            });
-          }}
+          onPress={() => this.initEvent()}
         />
       </View>
     );
@@ -139,14 +138,18 @@ class Playlist extends Component {
 }
 
 Playlist.propTypes = {
+  createEvent: PropTypes.func.isRequired,
   playlists: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({
       href: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       images: PropTypes.array.isRequired,
-      tracks: PropTypes.shape({}).isRequired,
+      tracks: PropTypes.shape({
+        total: PropTypes.number.isRequired,
+      }).isRequired,
     }).isRequired).isRequired,
   }).isRequired,
+  user: PropTypes.shape({}).isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
     state: PropTypes.shape({
@@ -188,11 +191,12 @@ const styles = StyleSheet.create({
 const PlaylistConnector = connect(state => (
   {
     playlists: state.spotify.playlists,
+    user: state.auth.user.data,
   }
 ), dispatch => (
   {
-    fetchSptPlaylists: () => (
-      dispatch(fetchSptPlaylistsAction())
+    createEvent: event => (
+      dispatch(createEventAction(event))
     ),
   }
 ))(Playlist);
