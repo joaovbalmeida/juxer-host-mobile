@@ -1,4 +1,5 @@
 import api from '../../api';
+import store from '../index';
 
 const requestEvent = () => (
   {
@@ -38,42 +39,45 @@ const resetUserEvents = () => (
   }
 );
 
+const updatedCallback = (event) => {
+  console.log(event);
+  store.dispatch(receiveEvent(event));
+};
+
 const createEvent = event => (
   (dispatch) => {
     dispatch(requestEvent());
 
-    const playlists = [...event.playlists.map((item) => {
+    const playlists = [...event.playlists.map(async (item) => {
       const playlist = {
         url: item.url,
         startDate: item.startDate,
         endDate: item.endDate,
       };
-      let id = '';
-      createPlaylist(playlist).then((result) => {
-        id = `${result._id}`; // eslint-disable-line
-      });
-      console.log(id);
-      return id;
+      return createPlaylist(playlist).then(result => result._id, () => null); // eslint-disable-line
     })];
-    console.log(playlists);
-    if (playlists.includes('')) {
-      dispatch(receiveEvent('', false));
-      return null;
-    }
-    return api.events.create({
-      name: event.name,
-      secret: event.secret,
-      user: event.user,
-      playlists,
-    }).then((response) => {
-      console.log(response);
-      // dispatch(receiveEvent(response.accessToken, true));
-      return response;
-    }, (erro) => {
-      console.log(erro);
-      dispatch(receiveEvent('', false));
-      return error;
-    });
+
+    return Promise.all(playlists)
+      .then((result) => {
+        if (result.includes(null)) return null;
+
+        return api.events.create({
+          name: event.name,
+          secret: event.secret,
+          user: event.user,
+          playlists: result,
+        }).then((response) => {
+          dispatch(receiveEvent(response, true));
+
+          api.events.on('patched', updatedCallback);
+          api.events.on('updated', updatedCallback);
+
+          return response;
+        }, (error) => {
+          dispatch(receiveEvent('', false));
+          return error;
+        });
+      }).catch(error => error);
   }
 );
 
@@ -110,7 +114,6 @@ const fetchEvent = id => (
 );
 
 const createPlaylist = playlist => (
-
   api.playlists.create({ ...playlist })
     .then(response => response, error => error)
 );

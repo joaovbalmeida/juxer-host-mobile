@@ -58909,7 +58909,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   };
 
   exports.default = App;
-},489,[109,490,512,524,12,525,746],"juxerhost/App.js");
+},489,[109,490,512,524,12,525,735],"juxerhost/App.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   'use strict';
 
@@ -61624,7 +61624,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   }, {
     initialRouteName: 'Loading'
   });
-},525,[526,644,735,745],"juxerhost/app/routes/index.js");
+},525,[526,644,742,752],"juxerhost/app/routes/index.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = {
     get createNavigationContainer() {
@@ -89586,9 +89586,15 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+  var _this = this;
+
   var _api = require(_dependencyMap[0], "../../api");
 
   var _api2 = _interopRequireDefault(_api);
+
+  var _index = require(_dependencyMap[1], "../index");
+
+  var _index2 = _interopRequireDefault(_index);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -89632,40 +89638,59 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   };
 
+  var updatedCallback = function updatedCallback(event) {
+    console.log(event);
+
+    _index2.default.dispatch(receiveEvent(event));
+  };
+
   var createEvent = function createEvent(event) {
     return function (dispatch) {
       dispatch(requestEvent());
-      var playlists = [].concat(_toConsumableArray(event.playlists.map(function (item) {
-        var playlist = {
-          url: item.url,
-          startDate: item.startDate,
-          endDate: item.endDate
-        };
-        var id = '';
-        createPlaylist(playlist).then(function (result) {
-          id = "" + result._id;
-        });
-        console.log(id);
-        return id;
+      var playlists = [].concat(_toConsumableArray(event.playlists.map(function _callee(item) {
+        var playlist;
+        return regeneratorRuntime.async(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                playlist = {
+                  url: item.url,
+                  startDate: item.startDate,
+                  endDate: item.endDate
+                };
+                return _context.abrupt("return", createPlaylist(playlist).then(function (result) {
+                  return result._id;
+                }, function () {
+                  return null;
+                }));
+
+              case 2:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, null, _this);
       })));
-      console.log(playlists);
+      return Promise.all(playlists).then(function (result) {
+        if (result.includes(null)) return null;
+        return _api2.default.events.create({
+          name: event.name,
+          secret: event.secret,
+          user: event.user,
+          playlists: result
+        }).then(function (response) {
+          dispatch(receiveEvent(response, true));
 
-      if (playlists.includes('')) {
-        dispatch(receiveEvent('', false));
-        return null;
-      }
+          _api2.default.events.on('patched', updatedCallback);
 
-      return _api2.default.events.create({
-        name: event.name,
-        secret: event.secret,
-        user: event.user,
-        playlists: playlists
-      }).then(function (response) {
-        console.log(response);
-        return response;
-      }, function (erro) {
-        console.log(erro);
-        dispatch(receiveEvent('', false));
+          _api2.default.events.on('updated', updatedCallback);
+
+          return response;
+        }, function (error) {
+          dispatch(receiveEvent('', false));
+          return error;
+        });
+      }).catch(function (error) {
         return error;
       });
     };
@@ -89733,7 +89758,367 @@ __d(function (global, require, module, exports, _dependencyMap) {
     resetEvent: resetEvent,
     createEvent: createEvent
   };
-},734,[653],"juxerhost/app/store/actions/event.js");
+},734,[653,735],"juxerhost/app/store/actions/event.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _redux = require(_dependencyMap[0], "redux");
+
+  var _reduxThunk = require(_dependencyMap[1], "redux-thunk");
+
+  var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
+
+  var _storage = require(_dependencyMap[2], "redux-persist/lib/storage");
+
+  var _storage2 = _interopRequireDefault(_storage);
+
+  var _reduxPersist = require(_dependencyMap[3], "redux-persist");
+
+  var _reducers = require(_dependencyMap[4], "./reducers");
+
+  var _reducers2 = _interopRequireDefault(_reducers);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var persistConfig = {
+    key: 'root',
+    storage: _storage2.default
+  };
+  var reducer = (0, _reduxPersist.persistCombineReducers)(persistConfig, _reducers2.default);
+  var store = (0, _redux.createStore)(reducer, (0, _redux.applyMiddleware)(_reduxThunk2.default));
+  exports.default = store;
+},735,[501,736,737,512,738],"juxerhost/app/store/index.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  'use strict';
+
+  exports.__esModule = true;
+
+  function createThunkMiddleware(extraArgument) {
+    return function (_ref) {
+      var dispatch = _ref.dispatch,
+          getState = _ref.getState;
+      return function (next) {
+        return function (action) {
+          if (typeof action === 'function') {
+            return action(dispatch, getState, extraArgument);
+          }
+
+          return next(action);
+        };
+      };
+    };
+  }
+
+  var thunk = createThunkMiddleware();
+  thunk.withExtraArgument = createThunkMiddleware;
+  exports['default'] = thunk;
+},736,[],"redux-thunk/lib/index.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  'use strict';
+
+  exports.__esModule = true;
+
+  var _reactNative = require(_dependencyMap[0], 'react-native');
+
+  exports.default = _reactNative.AsyncStorage;
+},737,[12],"redux-persist/lib/storage/index.native.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _auth = require(_dependencyMap[0], "./auth");
+
+  var _auth2 = _interopRequireDefault(_auth);
+
+  var _spotify = require(_dependencyMap[1], "./spotify");
+
+  var _spotify2 = _interopRequireDefault(_spotify);
+
+  var _event = require(_dependencyMap[2], "./event");
+
+  var _event2 = _interopRequireDefault(_event);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var store = {
+    auth: _auth2.default,
+    spotify: _spotify2.default,
+    event: _event2.default
+  };
+  exports.default = store;
+},738,[739,740,741],"juxerhost/app/store/reducers/index.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+  var initialState = {
+    authenticated: false,
+    token: {
+      isFetching: false,
+      lastUpdated: '',
+      data: ''
+    },
+    user: {
+      isFetching: false,
+      lastUpdated: '',
+      data: {}
+    }
+  };
+
+  var auth = function auth() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    switch (action.type) {
+      case 'REQUEST_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: true,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'RECEIVE_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.user
+          }
+        });
+
+      case 'RESET_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'REQUEST_TOKEN':
+        return _extends({}, state, {
+          token: {
+            data: '',
+            isFetching: true,
+            lastUpdated: ''
+          },
+          authenticated: false
+        });
+
+      case 'RECEIVE_TOKEN':
+        return _extends({}, state, {
+          token: {
+            data: action.token,
+            isFetching: false,
+            lastUpdated: Date.now()
+          },
+          authenticated: action.auth
+        });
+
+      default:
+        return state;
+    }
+  };
+
+  exports.default = auth;
+},739,[],"juxerhost/app/store/reducers/auth.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+  var initialState = {
+    authenticated: false,
+    token: {
+      isFetching: false,
+      lastUpdated: '',
+      data: ''
+    },
+    user: {
+      isFetching: false,
+      lastUpdated: '',
+      data: {}
+    },
+    playlists: {
+      isFetching: false,
+      lastUpdated: '',
+      data: []
+    }
+  };
+
+  var sptAuth = function sptAuth() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    switch (action.type) {
+      case 'REQUEST_SPT_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: true,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'REQUEST_SPT_PLAYLISTS':
+        return _extends({}, state, {
+          playlists: {
+            isFetching: true,
+            lastUpdated: '',
+            data: []
+          }
+        });
+
+      case 'RECEIVE_SPT_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.user
+          }
+        });
+
+      case 'RECEIVE_SPT_PLAYLISTS':
+        return _extends({}, state, {
+          playlists: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.playlists
+          }
+        });
+
+      case 'RESET_SPT_USER':
+        return _extends({}, state, {
+          user: {
+            isFetching: false,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'REQUEST_SPT_AUTH':
+        return _extends({}, state, {
+          token: {
+            data: '',
+            isFetching: true,
+            lastUpdated: ''
+          },
+          authenticated: false
+        });
+
+      case 'RECEIVE_SPT_AUTH':
+        return _extends({}, state, {
+          token: {
+            data: action.auth,
+            isFetching: false,
+            lastUpdated: Date.now()
+          },
+          authenticated: true
+        });
+
+      default:
+        return state;
+    }
+  };
+
+  exports.default = sptAuth;
+},740,[],"juxerhost/app/store/reducers/spotify.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+  var initialState = {
+    event: {
+      isFetching: false,
+      lastUpdated: '',
+      data: {}
+    },
+    userEvents: {
+      isFetching: false,
+      lastUpdated: '',
+      data: []
+    }
+  };
+
+  var sptAuth = function sptAuth() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    switch (action.type) {
+      case 'REQUEST_USER_EVENTS':
+        return _extends({}, state, {
+          userEvents: {
+            isFetching: true,
+            lastUpdated: '',
+            data: []
+          }
+        });
+
+      case 'REQUEST_EVENT':
+        return _extends({}, state, {
+          event: {
+            isFetching: true,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'RECEIVE_USER_EVENTS':
+        return _extends({}, state, {
+          userEvents: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.events
+          }
+        });
+
+      case 'RECEIVE_EVENT':
+        return _extends({}, state, {
+          event: {
+            isFetching: false,
+            lastUpdated: Date.now(),
+            data: action.event
+          }
+        });
+
+      case 'RESET_EVENT':
+        return _extends({}, state, {
+          event: {
+            isFetching: false,
+            lastUpdated: '',
+            data: {}
+          }
+        });
+
+      case 'RESET_USER_EVENTS':
+        return _extends({}, state, {
+          userEvents: {
+            isFetching: false,
+            lastUpdated: '',
+            data: []
+          }
+        });
+
+      default:
+        return state;
+    }
+  };
+
+  exports.default = sptAuth;
+},741,[],"juxerhost/app/store/reducers/event.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -89763,7 +90148,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     initialRouteName: 'Home'
   });
   exports.default = AppStack;
-},735,[526,736,739,740],"juxerhost/app/routes/app.js");
+},742,[526,743,746,747],"juxerhost/app/routes/app.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -89953,7 +90338,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Home);
   exports.default = HomeConnector;
-},736,[109,128,12,490,292,737,651],"juxerhost/app/screens/home.js");
+},743,[109,128,12,490,292,744,651],"juxerhost/app/screens/home.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -90088,7 +90473,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Playlist;
-},737,[109,12,292,738],"juxerhost/app/components/playlist.js");
+},744,[109,12,292,745],"juxerhost/app/components/playlist.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -90100,7 +90485,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "tick",
     "type": "png"
   });
-},738,[325],"app/assets/images/tick.png");
+},745,[325],"app/assets/images/tick.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -90340,7 +90725,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Event);
   exports.default = EventConnector;
-},739,[109,128,12,490,292,737,651],"juxerhost/app/screens/event.js");
+},746,[109,128,12,490,292,744,651],"juxerhost/app/screens/event.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -90667,7 +91052,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Playlist);
   exports.default = PlaylistConnector;
-},740,[109,128,12,490,292,741,743,737,651],"juxerhost/app/screens/playlist.js");
+},747,[109,128,12,490,292,748,750,744,651],"juxerhost/app/screens/playlist.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91371,7 +91756,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     locale: _propTypes2.default.string
   };
   exports.default = DatePicker;
-},741,[109,128,292,12,742,743,744],"react-native-datepicker/datepicker.js");
+},748,[109,128,292,12,749,750,751],"react-native-datepicker/datepicker.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91453,7 +91838,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = style;
-},742,[12],"react-native-datepicker/style.js");
+},749,[12],"react-native-datepicker/style.js");
 __d(function (global, require, module, exports, _dependencyMap) {
     ;
 
@@ -95574,7 +95959,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
         };
         return hooks;
     });
-},743,[],"moment/moment.js");
+},750,[],"moment/moment.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -95586,7 +95971,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "date_icon",
     "type": "png"
   });
-},744,[325],"node_modules/react-native-datepicker/date_icon.png");
+},751,[325],"node_modules/react-native-datepicker/date_icon.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -95760,367 +96145,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Loading);
   exports.default = LoadingConnector;
-},745,[109,128,12,490,292,646,651],"juxerhost/app/screens/loading.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _redux = require(_dependencyMap[0], "redux");
-
-  var _reduxThunk = require(_dependencyMap[1], "redux-thunk");
-
-  var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
-
-  var _storage = require(_dependencyMap[2], "redux-persist/lib/storage");
-
-  var _storage2 = _interopRequireDefault(_storage);
-
-  var _reduxPersist = require(_dependencyMap[3], "redux-persist");
-
-  var _reducers = require(_dependencyMap[4], "./reducers");
-
-  var _reducers2 = _interopRequireDefault(_reducers);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-  var persistConfig = {
-    key: 'root',
-    storage: _storage2.default
-  };
-  var reducer = (0, _reduxPersist.persistCombineReducers)(persistConfig, _reducers2.default);
-  var store = (0, _redux.createStore)(reducer, (0, _redux.applyMiddleware)(_reduxThunk2.default));
-  exports.default = store;
-},746,[501,747,748,512,749],"juxerhost/app/store/index.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  'use strict';
-
-  exports.__esModule = true;
-
-  function createThunkMiddleware(extraArgument) {
-    return function (_ref) {
-      var dispatch = _ref.dispatch,
-          getState = _ref.getState;
-      return function (next) {
-        return function (action) {
-          if (typeof action === 'function') {
-            return action(dispatch, getState, extraArgument);
-          }
-
-          return next(action);
-        };
-      };
-    };
-  }
-
-  var thunk = createThunkMiddleware();
-  thunk.withExtraArgument = createThunkMiddleware;
-  exports['default'] = thunk;
-},747,[],"redux-thunk/lib/index.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  'use strict';
-
-  exports.__esModule = true;
-
-  var _reactNative = require(_dependencyMap[0], 'react-native');
-
-  exports.default = _reactNative.AsyncStorage;
-},748,[12],"redux-persist/lib/storage/index.native.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _auth = require(_dependencyMap[0], "./auth");
-
-  var _auth2 = _interopRequireDefault(_auth);
-
-  var _spotify = require(_dependencyMap[1], "./spotify");
-
-  var _spotify2 = _interopRequireDefault(_spotify);
-
-  var _event = require(_dependencyMap[2], "./event");
-
-  var _event2 = _interopRequireDefault(_event);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-  var store = {
-    auth: _auth2.default,
-    spotify: _spotify2.default,
-    event: _event2.default
-  };
-  exports.default = store;
-},749,[750,751,752],"juxerhost/app/store/reducers/index.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var initialState = {
-    authenticated: false,
-    token: {
-      isFetching: false,
-      lastUpdated: '',
-      data: ''
-    },
-    user: {
-      isFetching: false,
-      lastUpdated: '',
-      data: {}
-    }
-  };
-
-  var auth = function auth() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-    var action = arguments[1];
-
-    switch (action.type) {
-      case 'REQUEST_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: true,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'RECEIVE_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.user
-          }
-        });
-
-      case 'RESET_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_TOKEN':
-        return _extends({}, state, {
-          token: {
-            data: '',
-            isFetching: true,
-            lastUpdated: ''
-          },
-          authenticated: false
-        });
-
-      case 'RECEIVE_TOKEN':
-        return _extends({}, state, {
-          token: {
-            data: action.token,
-            isFetching: false,
-            lastUpdated: Date.now()
-          },
-          authenticated: action.auth
-        });
-
-      default:
-        return state;
-    }
-  };
-
-  exports.default = auth;
-},750,[],"juxerhost/app/store/reducers/auth.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var initialState = {
-    authenticated: false,
-    token: {
-      isFetching: false,
-      lastUpdated: '',
-      data: ''
-    },
-    user: {
-      isFetching: false,
-      lastUpdated: '',
-      data: {}
-    },
-    playlists: {
-      isFetching: false,
-      lastUpdated: '',
-      data: []
-    }
-  };
-
-  var sptAuth = function sptAuth() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-    var action = arguments[1];
-
-    switch (action.type) {
-      case 'REQUEST_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: true,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_SPT_PLAYLISTS':
-        return _extends({}, state, {
-          playlists: {
-            isFetching: true,
-            lastUpdated: '',
-            data: []
-          }
-        });
-
-      case 'RECEIVE_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.user
-          }
-        });
-
-      case 'RECEIVE_SPT_PLAYLISTS':
-        return _extends({}, state, {
-          playlists: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.playlists
-          }
-        });
-
-      case 'RESET_SPT_USER':
-        return _extends({}, state, {
-          user: {
-            isFetching: false,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'REQUEST_SPT_AUTH':
-        return _extends({}, state, {
-          token: {
-            data: '',
-            isFetching: true,
-            lastUpdated: ''
-          },
-          authenticated: false
-        });
-
-      case 'RECEIVE_SPT_AUTH':
-        return _extends({}, state, {
-          token: {
-            data: action.auth,
-            isFetching: false,
-            lastUpdated: Date.now()
-          },
-          authenticated: true
-        });
-
-      default:
-        return state;
-    }
-  };
-
-  exports.default = sptAuth;
-},751,[],"juxerhost/app/store/reducers/spotify.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var initialState = {
-    event: {
-      isFetching: false,
-      lastUpdated: '',
-      data: {}
-    },
-    userEvents: {
-      isFetching: false,
-      lastUpdated: '',
-      data: []
-    }
-  };
-
-  var sptAuth = function sptAuth() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-    var action = arguments[1];
-
-    switch (action.type) {
-      case 'REQUEST_USER_EVENTS':
-        return _extends({}, state, {
-          userEvents: {
-            isFetching: true,
-            lastUpdated: '',
-            data: []
-          }
-        });
-
-      case 'REQUEST_EVENT':
-        return _extends({}, state, {
-          event: {
-            isFetching: true,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'RECEIVE_USER_EVENTS':
-        return _extends({}, state, {
-          userEvents: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.events
-          }
-        });
-
-      case 'RECEIVE_EVENT':
-        return _extends({}, state, {
-          event: {
-            isFetching: false,
-            lastUpdated: Date.now(),
-            data: action.event
-          }
-        });
-
-      case 'RESET_EVENT':
-        return _extends({}, state, {
-          event: {
-            isFetching: false,
-            lastUpdated: '',
-            data: {}
-          }
-        });
-
-      case 'RESET_USER_EVENTS':
-        return _extends({}, state, {
-          userEvents: {
-            isFetching: false,
-            lastUpdated: '',
-            data: []
-          }
-        });
-
-      default:
-        return state;
-    }
-  };
-
-  exports.default = sptAuth;
-},752,[],"juxerhost/app/store/reducers/event.js");
+},752,[109,128,12,490,292,646,651],"juxerhost/app/screens/loading.js");
 require(23);
 require(11);
 //# sourceMappingURL=index.map
