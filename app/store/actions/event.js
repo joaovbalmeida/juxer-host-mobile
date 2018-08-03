@@ -1,3 +1,5 @@
+import { paramsForServer } from 'feathers-hooks-common';
+
 import api from '../../api';
 import store from '../index';
 
@@ -41,7 +43,7 @@ const resetUserEvents = () => (
 
 const updatedCallback = (event) => {
   console.log(event);
-  store.dispatch(receiveEvent(event));
+  // store.dispatch(receiveEvent(event));
 };
 
 const createEvent = event => (
@@ -64,9 +66,11 @@ const createEvent = event => (
         return api.events.create({
           name: event.name,
           secret: event.secret,
-          user: event.user,
           playlists: result,
-        }).then((response) => {
+          active: true,
+        }, paramsForServer({
+          user: store.getState().auth.user.data,
+        })).then((response) => {
           dispatch(receiveEvent(response, true));
 
           api.events.on('patched', updatedCallback);

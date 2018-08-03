@@ -49,7 +49,6 @@ class Playlist extends Component {
       }
     ))];
     const event = {
-      user: this.props.user._id, // eslint-disable-line
       name: this.props.navigation.state.params.name,
       secret: this.props.navigation.state.params.secret,
       playlists,
@@ -149,7 +148,6 @@ Playlist.propTypes = {
       }).isRequired,
     }).isRequired).isRequired,
   }).isRequired,
-  user: PropTypes.shape({}).isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
     state: PropTypes.shape({
@@ -191,7 +189,6 @@ const styles = StyleSheet.create({
 const PlaylistConnector = connect(state => (
   {
     playlists: state.spotify.playlists,
-    user: state.auth.user.data,
   }
 ), dispatch => (
   {
