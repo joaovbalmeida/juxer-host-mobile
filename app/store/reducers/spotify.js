@@ -10,7 +10,7 @@ const initialState = {
     lastUpdated: '',
     data: {},
   },
-  playlists: {
+  userPlaylists: {
     isFetching: false,
     lastUpdated: '',
     data: [],
@@ -28,9 +28,9 @@ const sptAuth = (state = initialState, action) => {
         },
       });
 
-    case 'REQUEST_SPT_PLAYLISTS':
+    case 'REQUEST_USER_PLAYLISTS':
       return Object.assign({}, state, {
-        playlists: {
+        userPlaylists: {
           isFetching: true,
           lastUpdated: '',
           data: [],
@@ -46,9 +46,9 @@ const sptAuth = (state = initialState, action) => {
         },
       });
 
-    case 'RECEIVE_SPT_PLAYLISTS':
+    case 'RECEIVE_USER_PLAYLISTS':
       return Object.assign({}, state, {
-        playlists: {
+        userPlaylists: {
           isFetching: false,
           lastUpdated: Date.now(),
           data: action.playlists,

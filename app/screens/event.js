@@ -13,7 +13,7 @@ import Playlist from '../components/playlist';
 import actions from '../store/actions';
 
 const {
-  fetchSptPlaylists: fetchSptPlaylistsAction,
+  fetchUserPlaylists: fetchUserPlaylistsAction,
 } = actions;
 
 class Event extends Component {
@@ -33,7 +33,7 @@ class Event extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchSptPlaylists();
+    this.props.fetchUserPlaylists();
   }
 
   selectPlaylist(e) {
@@ -97,7 +97,7 @@ Event.propTypes = {
   playlists: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
   }).isRequired,
-  fetchSptPlaylists: PropTypes.func.isRequired,
+  fetchUserPlaylists: PropTypes.func.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
@@ -117,8 +117,8 @@ const EventConnector = connect(state => (
   }
 ), dispatch => (
   {
-    fetchSptPlaylists: () => (
-      dispatch(fetchSptPlaylistsAction())
+    fetchUserPlaylists: () => (
+      dispatch(fetchUserPlaylistsAction())
     ),
   }
 ))(Event);

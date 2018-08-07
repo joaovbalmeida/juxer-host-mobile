@@ -41,77 +41,58 @@ const resetUserEvents = () => (
   }
 );
 
-const updatedCallback = (event) => {
-  console.log(event);
-  // store.dispatch(receiveEvent(event));
-};
+const resetQueue = () => (
+  {
+    type: 'RESET_QUEUE',
+  }
+);
+
+const forwardTrack = () => (
+  {
+    type: 'FORWARD_TRACK',
+  }
+);
 
 const createEvent = event => (
   (dispatch) => {
     dispatch(requestEvent());
 
-    const playlists = [...event.playlists.map(async (item) => {
-      const playlist = {
-        url: item.url,
-        startDate: item.startDate,
-        endDate: item.endDate,
-      };
-      return createPlaylist(playlist).then(result => result._id, () => null); // eslint-disable-line
-    })];
+    return api.events.create({
+      name: event.name,
+      secret: event.secret,
+      playlists: event.playlists,
+      active: true,
+    }, paramsForServer({
+      user: store.getState().auth.user.data,
+    })).then((response) => {
+      dispatch(receiveEvent(response, true));
 
-    return Promise.all(playlists)
-      .then((result) => {
-        if (result.includes(null)) return null;
+      api.events.on('patched', (data) => {
+        dispatch(receiveEvent(data, true));
+      });
 
-        return api.events.create({
-          name: event.name,
-          secret: event.secret,
-          playlists: result,
-          active: true,
-        }, paramsForServer({
-          user: store.getState().auth.user.data,
-        })).then((response) => {
-          dispatch(receiveEvent(response, true));
+      api.events.on('updated', (data) => {
+        dispatch(receiveEvent(data, true));
+      });
 
-          api.events.on('patched', updatedCallback);
-          api.events.on('updated', updatedCallback);
-
-          return response;
-        }, (error) => {
-          dispatch(receiveEvent('', false));
-          return error;
-        });
-      }).catch(error => error);
+      return response;
+    }, (error) => {
+      dispatch(receiveEvent('', false));
+      return error;
+    });
   }
 );
 
-const fetchUserEvents = user => (
+const fetchUserEvents = () => (
   (dispatch) => {
     dispatch(requestUserEvents());
 
-    return api.events.find({ query: { email: user } })
+    return api.events.find({ query: { user: api.getState().auth.user.data._id } }) // eslint-disable-line
       .then((response) => {
-        console.log(response);
-        // dispatch(receiveUserEvents(response, true));
+        dispatch(receiveUserEvents(response, true));
         return response;
       }, (error) => {
         dispatch(receiveUserEvents('', false));
-        return error;
-      });
-  }
-);
-
-const fetchEvent = id => (
-  (dispatch) => {
-    dispatch(requestEvent());
-
-    return api.event.find({ query: { _id: id } })
-      .then((response) => {
-        console.log(response);
-        // dispatch(receiveEvent(response.accessToken, true));
-        return response;
-      }, (error) => {
-        dispatch(receiveEvent('', false));
         return error;
       });
   }
@@ -137,4 +118,6 @@ export default {
   fetchEvent,
   resetEvent,
   createEvent,
+  resetQueue,
+  forwardTrack,
 };

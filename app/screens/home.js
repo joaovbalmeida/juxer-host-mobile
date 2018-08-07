@@ -9,12 +9,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Playlist from '../components/playlist';
+import Event from '../components/event';
 import actions from '../store/actions';
 
 const {
   logout: logoutAction,
   sptLogout: sptLogoutAction,
-  fetchSptPlaylists: fetchSptPlaylistsAction,
+  fetchUserPlaylists: fetchUserPlaylistsAction,
+  fetchUserEvents: fetchUserEventsAction,
 } = actions;
 
 class Home extends Component {
@@ -29,7 +31,8 @@ class Home extends Component {
   });
 
   componentDidMount() {
-    this.props.fetchSptPlaylists();
+    this.props.fetchUserPlaylists();
+    this.props.fetchUserEvents();
   }
 
   render() {
@@ -47,6 +50,16 @@ class Home extends Component {
           )}
           keyExtractor={item => item.id}
           horizontal
+        />
+        <FlatList
+          style={styles.events}
+          data={this.props.events.data}
+          renderItem={({ item }) => (
+            <Event
+              name={item.name}
+            />
+          )}
+          keyExtractor={item => item.id}
         />
         <Button
           title="logout"
@@ -68,9 +81,13 @@ Home.propTypes = {
   playlists: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
   }).isRequired,
+  events: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
+  }).isRequired,
   logout: PropTypes.func.isRequired,
   sptLogout: PropTypes.func.isRequired,
-  fetchSptPlaylists: PropTypes.func.isRequired,
+  fetchUserPlaylists: PropTypes.func.isRequired,
+  fetchUserEvents: PropTypes.func.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
@@ -87,6 +104,7 @@ const styles = StyleSheet.create({
 const HomeConnector = connect(state => (
   {
     playlists: state.spotify.playlists,
+    events: state.event.userEvents,
   }
 ), dispatch => (
   {
@@ -96,8 +114,11 @@ const HomeConnector = connect(state => (
     sptLogout: () => (
       dispatch(sptLogoutAction())
     ),
-    fetchSptPlaylists: () => (
-      dispatch(fetchSptPlaylistsAction())
+    fetchUserPlaylists: () => (
+      dispatch(fetchUserPlaylistsAction())
+    ),
+    fetchUserEvents: () => (
+      dispatch(fetchUserEventsAction())
     ),
   }
 ))(Home);

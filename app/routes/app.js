@@ -1,15 +1,13 @@
-import { createStackNavigator } from 'react-navigation';
+import { createSwitchNavigator } from 'react-navigation';
 
-import HomeScreen from '../screens/home';
-import EventScreen from '../screens/event';
-import PlaylistScreen from '../screens/playlist';
+import EventsStack from './events';
+import PlayerStack from './player';
 
-const AppStack = createStackNavigator({
-  Home: HomeScreen,
-  Event: EventScreen,
-  Playlist: PlaylistScreen,
+const AppStack = createSwitchNavigator({
+  Events: EventsStack,
+  Player: PlayerStack,
 }, {
-  initialRouteName: 'Home',
+  initialRouteName: 'Events',
 });
 
 export default AppStack;

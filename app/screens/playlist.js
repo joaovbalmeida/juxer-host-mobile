@@ -42,18 +42,21 @@ class Playlist extends Component {
 
   initEvent() {
     const playlists = [...this.state.playlists.map(item => (
-      {
-        url: item.url,
-        startDate: Moment(item.start).toDate(),
-        endDate: Moment(item.end).toDate(),
-      }
+      Object.assign({}, item, {
+        startDate: Moment(item.start),
+        endDate: Moment(item.end),
+      })
     ))];
     const event = {
       name: this.props.navigation.state.params.name,
       secret: this.props.navigation.state.params.secret,
       playlists,
     };
-    this.props.createEvent(event);
+    this.props.createEvent(event).then((result) => {
+      if (result._id) { // eslint-disable-line
+        this.props.navigation.navigate('Player');
+      }
+    });
   }
 
   render() {

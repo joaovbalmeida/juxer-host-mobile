@@ -1,13 +1,13 @@
 const initialState = {
-  event: {
-    isFetching: false,
-    lastUpdated: '',
-    data: {},
-  },
   userEvents: {
     isFetching: false,
     lastUpdated: '',
     data: [],
+  },
+  event: {
+    isFetching: false,
+    lastUpdated: '',
+    data: {},
   },
 };
 

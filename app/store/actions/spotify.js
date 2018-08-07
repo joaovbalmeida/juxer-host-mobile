@@ -14,15 +14,15 @@ const receiveSptAuth = (auth, fetching) => (
   }
 );
 
-const requestSptPlaylists = () => (
+const requestUserPlaylists = () => (
   {
-    type: 'REQUEST_SPT_PLAYLISTS',
+    type: 'REQUEST_USER_PLAYLISTS',
   }
 );
 
-const receiveSptPlaylists = playlists => (
+const receiveUserPlaylists = playlists => (
   {
-    type: 'RECEIVE_SPT_PLAYLISTS',
+    type: 'RECEIVE_USER_PLAYLISTS',
     playlists,
   }
 );
@@ -46,16 +46,16 @@ const resetSptUser = () => (
   }
 );
 
-const fetchSptPlaylists = () => (
+const fetchUserPlaylists = () => (
   (dispatch) => {
-    dispatch(requestSptPlaylists());
+    dispatch(requestUserPlaylists());
 
     return Spotify.sendRequest('v1/me/playlists', 'GET', { limit: 50 }, true)
       .then((response) => {
-        dispatch(receiveSptPlaylists(response.items));
+        dispatch(receiveUserPlaylists(response.items));
         return response;
       }, (error) => {
-        dispatch(receiveSptPlaylists({}));
+        dispatch(receiveUserPlaylists({}));
         return error;
       });
   }
@@ -133,5 +133,5 @@ export default {
   sptAuth,
   checkSptToken,
   fetchSptUser,
-  fetchSptPlaylists,
+  fetchUserPlaylists,
 };
