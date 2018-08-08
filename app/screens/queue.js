@@ -8,19 +8,24 @@ import {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { paramsForServer } from 'feathers-hooks-common';
+import Spotify from 'rn-spotify-sdk';
 
 import api from '../api';
 import Track from '../components/track';
 import actions from '../store/actions';
 
 const {
-  createEvent: createEventAction,
+  stopEvent: stopEventAction,
 } = actions;
 
 class Queue extends Component {
   static navigationOptions = () => ({
     title: 'Evento',
   });
+
+  componentWillUnmount() {
+    this.props.stopEvent(this.props.event._id); // eslint-disable-line
+  }
 
   render() {
     return (
@@ -50,7 +55,7 @@ class Queue extends Component {
               cover: 'https://i.scdn.co/image/1c4bacfab0e2fc59ea1f400bac4b57d9382476f5',
               owner: 'joaovbalmeida',
               uri: 'spotify:track:4qPTaehSZWKeaIgiIyprLs',
-            }}}, paramsForServer({ user: this.props.user }));
+            }}}, paramsForServer({ user: this.props.user })).then(oi => console.log(oi));
           }}
         />
       </View>
@@ -59,6 +64,7 @@ class Queue extends Component {
 }
 
 Queue.propTypes = {
+  stopEvent: PropTypes.func.isRequired,
   event: PropTypes.shape({
     queue: PropTypes.array.isRequired,
   }).isRequired,
@@ -101,8 +107,8 @@ const QueueConnector = connect(state => (
   }
 ), dispatch => (
   {
-    createEvent: event => (
-      dispatch(createEventAction(event))
+    stopEvent: event => (
+      dispatch(stopEventAction(event))
     ),
   }
 ))(Queue);

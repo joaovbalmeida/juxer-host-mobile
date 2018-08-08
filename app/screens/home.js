@@ -8,6 +8,7 @@ import {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import Placeholder from '../assets/images/coverPlaceholder.png';
 import Playlist from '../components/playlist';
 import Event from '../components/event';
 import actions from '../store/actions';
@@ -17,6 +18,7 @@ const {
   sptLogout: sptLogoutAction,
   fetchUserPlaylists: fetchUserPlaylistsAction,
   fetchUserEvents: fetchUserEventsAction,
+  startEvent: startEventAction,
 } = actions;
 
 class Home extends Component {
@@ -45,7 +47,7 @@ class Home extends Component {
             <Playlist
               name={item.name}
               qty={item.tracks.total.toString()}
-              image={item.images[0].url}
+              image={item.images.length ? item.images[0].url : Placeholder}
             />
           )}
           keyExtractor={item => item.id}
@@ -57,9 +59,17 @@ class Home extends Component {
           renderItem={({ item }) => (
             <Event
               name={item.name}
+              id={item._id} // eslint-disable-line
+              onPress={() => {
+                this.props.startEvent(item._id).then((result) => { // eslint-disable-line
+                  if (result._id) { // eslint-disable-line
+                    this.props.navigation.navigate('Player');
+                  }
+                });
+              }}
             />
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id} // eslint-disable-line
         />
         <Button
           title="logout"
@@ -88,6 +98,7 @@ Home.propTypes = {
   sptLogout: PropTypes.func.isRequired,
   fetchUserPlaylists: PropTypes.func.isRequired,
   fetchUserEvents: PropTypes.func.isRequired,
+  startEvent: PropTypes.func.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
@@ -103,7 +114,7 @@ const styles = StyleSheet.create({
 
 const HomeConnector = connect(state => (
   {
-    playlists: state.spotify.playlists,
+    playlists: state.spotify.userPlaylists,
     events: state.event.userEvents,
   }
 ), dispatch => (
@@ -119,6 +130,9 @@ const HomeConnector = connect(state => (
     ),
     fetchUserEvents: () => (
       dispatch(fetchUserEventsAction())
+    ),
+    startEvent: event => (
+      dispatch(startEventAction(event))
     ),
   }
 ))(Home);
