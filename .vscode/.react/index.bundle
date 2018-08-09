@@ -61624,7 +61624,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   }, {
     initialRouteName: 'Loading'
   });
-},525,[526,644,811,826],"juxerhost/app/routes/index.js");
+},525,[526,644,811,828],"juxerhost/app/routes/index.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = {
     get createNavigationContainer() {
@@ -93059,7 +93059,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _events2 = _interopRequireDefault(_events);
 
-  var _player = require(_dependencyMap[2], "./player");
+  var _player = require(_dependencyMap[2], "../screens/player");
 
   var _player2 = _interopRequireDefault(_player);
 
@@ -93072,7 +93072,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     initialRouteName: 'Events'
   });
   exports.default = AppStack;
-},811,[526,812,823],"juxerhost/app/routes/app.js");
+},811,[526,812,831],"juxerhost/app/routes/app.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -93102,7 +93102,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     initialRouteName: 'Home'
   });
   exports.default = EventsStack;
-},812,[526,813,817,818],"juxerhost/app/routes/events.js");
+},812,[526,813,818,819],"juxerhost/app/routes/events.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -93344,7 +93344,19 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Home);
   exports.default = HomeConnector;
-},813,[109,128,12,490,292,828,814,816,646],"juxerhost/app/screens/home.js");
+},813,[109,128,12,490,292,814,815,817,646],"juxerhost/app/screens/home.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 300,
+    "height": 300,
+    "scales": [1],
+    "hash": "088c4592c5ca83e7dca3a6b327882192",
+    "name": "coverPlaceholder",
+    "type": "png"
+  });
+},814,[325],"app/assets/images/coverPlaceholder.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -93479,7 +93491,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Playlist;
-},814,[109,12,292,815],"juxerhost/app/components/playlist.js");
+},815,[109,12,292,816],"juxerhost/app/components/playlist.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -93491,7 +93503,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "tick",
     "type": "png"
   });
-},815,[325],"app/assets/images/tick.png");
+},816,[325],"app/assets/images/tick.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -93567,7 +93579,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Event;
-},816,[109,12,292],"juxerhost/app/components/event.js");
+},817,[109,12,292],"juxerhost/app/components/event.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -93807,7 +93819,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Event);
   exports.default = EventConnector;
-},817,[109,128,12,490,292,814,646],"juxerhost/app/screens/event.js");
+},818,[109,128,12,490,292,815,646],"juxerhost/app/screens/event.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -94138,7 +94150,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Playlist);
   exports.default = PlaylistConnector;
-},818,[109,128,12,490,292,819,821,814,646],"juxerhost/app/screens/playlist.js");
+},819,[109,128,12,490,292,820,822,815,646],"juxerhost/app/screens/playlist.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -94842,7 +94854,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     locale: _propTypes2.default.string
   };
   exports.default = DatePicker;
-},819,[109,128,292,12,820,821,822],"react-native-datepicker/datepicker.js");
+},820,[109,128,292,12,821,822,823],"react-native-datepicker/datepicker.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -94924,7 +94936,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = style;
-},820,[12],"react-native-datepicker/style.js");
+},821,[12],"react-native-datepicker/style.js");
 __d(function (global, require, module, exports, _dependencyMap) {
     ;
 
@@ -99045,7 +99057,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
         };
         return hooks;
     });
-},821,[],"moment/moment.js");
+},822,[],"moment/moment.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -99057,7 +99069,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "date_icon",
     "type": "png"
   });
-},822,[325],"node_modules/react-native-datepicker/date_icon.png");
+},823,[325],"node_modules/react-native-datepicker/date_icon.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99071,13 +99083,13 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  var PlayerStack = (0, _reactNavigation.createStackNavigator)({
+  var PlayerTab = (0, _reactNavigation.createBottomTabNavigator)({
     Queue: _queue2.default
   }, {
     initialRouteName: 'Queue'
   });
-  exports.default = PlayerStack;
-},823,[526,824],"juxerhost/app/routes/player.js");
+  exports.default = PlayerTab;
+},824,[526,825],"juxerhost/app/routes/player.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99107,19 +99119,15 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _feathersHooksCommon = require(_dependencyMap[5], "feathers-hooks-common");
 
-  var _rnSpotifySdk = require(_dependencyMap[6], "rn-spotify-sdk");
-
-  var _rnSpotifySdk2 = _interopRequireDefault(_rnSpotifySdk);
-
-  var _api = require(_dependencyMap[7], "../api");
+  var _api = require(_dependencyMap[6], "../api");
 
   var _api2 = _interopRequireDefault(_api);
 
-  var _track = require(_dependencyMap[8], "../components/track");
+  var _track = require(_dependencyMap[7], "../components/track");
 
   var _track2 = _interopRequireDefault(_track);
 
-  var _actions = require(_dependencyMap[9], "../store/actions");
+  var _actions = require(_dependencyMap[8], "../store/actions");
 
   var _actions2 = _interopRequireDefault(_actions);
 
@@ -99162,13 +99170,6 @@ __d(function (global, require, module, exports, _dependencyMap) {
     }
 
     _createClass(Queue, [{
-      key: "componentDidMount",
-      value: function componentDidMount() {
-        if (this.props.event.queue[0]) {
-          _rnSpotifySdk2.default.playURI(this.props.event.queue[0].uri, 0, 0);
-        }
-      }
-    }, {
       key: "componentWillUnmount",
       value: function componentWillUnmount() {
         this.props.stopEvent(this.props.event._id);
@@ -99181,9 +99182,10 @@ __d(function (global, require, module, exports, _dependencyMap) {
         return _react3.default.createElement(
           _reactNative.View,
           {
+            style: styles.container,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 38
+              lineNumber: 31
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -99201,7 +99203,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                 owner: item.owner,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 43
+                  lineNumber: 36
                 }
               });
             },
@@ -99210,7 +99212,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 39
+              lineNumber: 32
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
@@ -99235,7 +99237,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 54
+              lineNumber: 47
             }
           })
         );
@@ -99261,6 +99263,9 @@ __d(function (global, require, module, exports, _dependencyMap) {
   };
 
   var styles = _reactNative.StyleSheet.create({
+    container: {
+      flex: 1
+    },
     playlists: {
       height: '80%',
       width: '100%',
@@ -99299,7 +99304,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Queue);
   exports.default = QueueConnector;
-},824,[109,128,12,490,292,735,729,648,825,646],"juxerhost/app/screens/queue.js");
+},825,[109,128,12,490,292,735,648,827,646],"juxerhost/app/screens/queue.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99425,7 +99430,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Track;
-},825,[109,12,292],"juxerhost/app/components/track.js");
+},827,[109,12,292],"juxerhost/app/components/track.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99599,19 +99604,502 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Loading);
   exports.default = LoadingConnector;
-},826,[109,128,12,490,292,729,646],"juxerhost/app/screens/loading.js");
+},828,[109,128,12,490,292,729,646],"juxerhost/app/screens/loading.js");
 __d(function (global, require, module, exports, _dependencyMap) {
-  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
-    "__packager_asset": true,
-    "httpServerLocation": "/assets/app/assets/images",
-    "width": 300,
-    "height": 300,
-    "scales": [1],
-    "hash": "088c4592c5ca83e7dca3a6b327882192",
-    "name": "coverPlaceholder",
-    "type": "png"
+  Object.defineProperty(exports, "__esModule", {
+    value: true
   });
-},828,[325],"app/assets/images/coverPlaceholder.png");
+
+  var _react2 = require(_dependencyMap[0], "react");
+
+  var _react3 = _interopRequireDefault(_react2);
+
+  var _index = require(_dependencyMap[1], "./../../node_modules/react-transform-hmr/lib/index.js");
+
+  var _index2 = _interopRequireDefault(_index);
+
+  var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+  var _class,
+      _temp,
+      _jsxFileName = "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/screens/player.js";
+
+  var _reactNative = require(_dependencyMap[2], "react-native");
+
+  var _reactRedux = require(_dependencyMap[3], "react-redux");
+
+  var _propTypes = require(_dependencyMap[4], "prop-types");
+
+  var _propTypes2 = _interopRequireDefault(_propTypes);
+
+  var _rnSpotifySdk = require(_dependencyMap[5], "rn-spotify-sdk");
+
+  var _rnSpotifySdk2 = _interopRequireDefault(_rnSpotifySdk);
+
+  var _player = require(_dependencyMap[6], "../routes/player");
+
+  var _player2 = _interopRequireDefault(_player);
+
+  var _player3 = require(_dependencyMap[7], "../components/player");
+
+  var _player4 = _interopRequireDefault(_player3);
+
+  var _footer = require(_dependencyMap[8], "../components/footer");
+
+  var _footer2 = _interopRequireDefault(_footer);
+
+  var _actions = require(_dependencyMap[9], "../store/actions");
+
+  var _actions2 = _interopRequireDefault(_actions);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+  function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+  function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+  var _components = {
+    Player: {
+      displayName: "Player"
+    }
+  };
+
+  var _node_modulesReactTransformHmrLibIndexJs2 = (0, _index2.default)({
+    filename: "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/screens/player.js",
+    components: _components,
+    locals: [module],
+    imports: [_react3.default]
+  });
+
+  function _wrapComponent(id) {
+    return function (Component) {
+      return _node_modulesReactTransformHmrLibIndexJs2(Component, id);
+    };
+  }
+
+  var stopEventAction = _actions2.default.stopEvent;
+
+  var Player = _wrapComponent("Player")((_temp = _class = function (_Component) {
+    _inherits(Player, _Component);
+
+    function Player(props) {
+      _classCallCheck(this, Player);
+
+      var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, props));
+
+      _this.state = {
+        visible: false
+      };
+      _this.show = _this.show.bind(_this);
+      _this.hide = _this.hide.bind(_this);
+      return _this;
+    }
+
+    _createClass(Player, [{
+      key: "show",
+      value: function show() {
+        this.setState({
+          visible: true
+        });
+      }
+    }, {
+      key: "hide",
+      value: function hide() {
+        this.setState({
+          visible: false
+        });
+      }
+    }, {
+      key: "render",
+      value: function render() {
+        return _react3.default.createElement(
+          _reactNative.View,
+          {
+            style: styles.container,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 46
+            }
+          },
+          _react3.default.createElement(_player2.default, {
+            navigation: this.props.navigation,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 47
+            }
+          }),
+          _react3.default.createElement(_footer2.default, {
+            show: this.show,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 48
+            }
+          }),
+          _react3.default.createElement(_player4.default, {
+            visible: this.state.visible,
+            hide: this.hide,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 51
+            }
+          })
+        );
+      }
+    }]);
+
+    return Player;
+  }(_react2.Component), _class.router = _player2.default.router, _class.navigationOptions = function () {
+    return {
+      header: null
+    };
+  }, _temp));
+
+  Player.propTypes = {
+    stopEvent: _propTypes2.default.func.isRequired,
+    event: _propTypes2.default.shape({
+      queue: _propTypes2.default.array.isRequired
+    }).isRequired,
+    user: _propTypes2.default.shape({}).isRequired,
+    navigation: _propTypes2.default.shape({
+      navigate: _propTypes2.default.func.isRequired
+    }).isRequired
+  };
+
+  var styles = _reactNative.StyleSheet.create({
+    container: {
+      flex: 1
+    }
+  });
+
+  var PlayerConnector = (0, _reactRedux.connect)(function (state) {
+    return {
+      event: state.event.event.data,
+      user: state.auth.user.data
+    };
+  }, function (dispatch) {
+    return {
+      stopEvent: function stopEvent(event) {
+        return dispatch(stopEventAction(event));
+      }
+    };
+  })(Player);
+  exports.default = PlayerConnector;
+},831,[109,128,12,490,292,729,824,826,830,646],"juxerhost/app/screens/player.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  var _jsxFileName = "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/components/player.js";
+
+  var _react = require(_dependencyMap[0], "react");
+
+  var _react2 = _interopRequireDefault(_react);
+
+  var _reactNative = require(_dependencyMap[1], "react-native");
+
+  var _propTypes = require(_dependencyMap[2], "prop-types");
+
+  var _propTypes2 = _interopRequireDefault(_propTypes);
+
+  var _tick = require(_dependencyMap[3], "../assets/images/tick.png");
+
+  var _tick2 = _interopRequireDefault(_tick);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var Player = function Player(_ref) {
+    var name = _ref.name,
+        artist = _ref.artist,
+        album = _ref.album,
+        cover = _ref.cover,
+        owner = _ref.owner,
+        visible = _ref.visible,
+        hide = _ref.hide;
+    return _react2.default.createElement(
+      _reactNative.Modal,
+      {
+        animationType: "slide",
+        transparent: false,
+        visible: visible,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 24
+        }
+      },
+      _react2.default.createElement(
+        _reactNative.View,
+        {
+          style: styles.container,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 29
+          }
+        },
+        _react2.default.createElement(
+          _reactNative.View,
+          {
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 30
+            }
+          },
+          _react2.default.createElement(
+            _reactNative.TouchableOpacity,
+            {
+              onPress: hide,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 31
+              }
+            },
+            _react2.default.createElement(
+              _reactNative.View,
+              {
+                style: {
+                  padding: 15
+                },
+                __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 34
+                }
+              },
+              _react2.default.createElement(_reactNative.Image, {
+                style: styles.upArrow,
+                source: _tick2.default,
+                __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 35
+                }
+              })
+            )
+          )
+        ),
+        _react2.default.createElement(_reactNative.Image, {
+          style: {
+            height: 150,
+            width: 150,
+            alignSelf: 'center',
+            borderRadius: 10
+          },
+          source: _tick2.default,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 42
+          }
+        }),
+        _react2.default.createElement(
+          _reactNative.Text,
+          {
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 46
+            }
+          },
+          "Thunder"
+        ),
+        _react2.default.createElement(
+          _reactNative.Text,
+          {
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 47
+            }
+          },
+          "Imagine Dragons"
+        )
+      )
+    );
+  };
+
+  Player.propTypes = {
+    name: _propTypes2.default.string.isRequired,
+    artist: _propTypes2.default.string.isRequired,
+    album: _propTypes2.default.string.isRequired,
+    cover: _propTypes2.default.string.isRequired,
+    visible: _propTypes2.default.bool.isRequired,
+    hide: _propTypes2.default.func.isRequired
+  };
+
+  var styles = _reactNative.StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#222222'
+    },
+    upArrow: {
+      width: 20,
+      height: 20
+    },
+    playArrow: {
+      width: 27,
+      height: 27
+    }
+  });
+
+  exports.default = Player;
+},826,[109,12,292,816],"juxerhost/app/components/player.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  var _jsxFileName = "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/components/footer.js";
+
+  var _react = require(_dependencyMap[0], "react");
+
+  var _react2 = _interopRequireDefault(_react);
+
+  var _reactNative = require(_dependencyMap[1], "react-native");
+
+  var _propTypes = require(_dependencyMap[2], "prop-types");
+
+  var _propTypes2 = _interopRequireDefault(_propTypes);
+
+  var _tick = require(_dependencyMap[3], "../assets/images/tick.png");
+
+  var _tick2 = _interopRequireDefault(_tick);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var Footer = function Footer(_ref) {
+    var name = _ref.name,
+        artist = _ref.artist,
+        show = _ref.show;
+    return _react2.default.createElement(
+      _reactNative.View,
+      {
+        style: styles.container,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 19
+        }
+      },
+      _react2.default.createElement(
+        _reactNative.TouchableOpacity,
+        {
+          onPress: show,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 20
+          }
+        },
+        _react2.default.createElement(
+          _reactNative.View,
+          {
+            style: {
+              marginLeft: 15
+            },
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 21
+            }
+          },
+          _react2.default.createElement(_reactNative.Image, {
+            style: styles.upArrow,
+            source: _tick2.default,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 22
+            }
+          })
+        )
+      ),
+      _react2.default.createElement(
+        _reactNative.TouchableOpacity,
+        {
+          onPress: show,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 28
+          }
+        },
+        _react2.default.createElement(
+          _reactNative.View,
+          {
+            style: {
+              alignItems: 'center'
+            },
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 29
+            }
+          },
+          _react2.default.createElement(
+            _reactNative.Text,
+            {
+              style: styles.playerTextTitle,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 30
+              }
+            },
+            name
+          ),
+          _react2.default.createElement(
+            _reactNative.Text,
+            {
+              style: styles.playerTextYear,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 33
+              }
+            },
+            artist
+          )
+        )
+      ),
+      _react2.default.createElement(
+        _reactNative.View,
+        {
+          style: {
+            marginRight: 15
+          },
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 38
+          }
+        },
+        _react2.default.createElement(_reactNative.Image, {
+          style: styles.playArrow,
+          source: _tick2.default,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 39
+          }
+        })
+      )
+    );
+  };
+
+  Footer.propTypes = {
+    name: _propTypes2.default.string.isRequired,
+    artist: _propTypes2.default.string.isRequired,
+    show: _propTypes2.default.func.isRequired
+  };
+
+  var styles = _reactNative.StyleSheet.create({
+    container: {
+      position: 'absolute',
+      bottom: 49,
+      height: 50,
+      width: '100%',
+      backgroundColor: '#222222',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    },
+    upArrow: {
+      width: 20,
+      height: 20
+    },
+    playArrow: {
+      width: 27,
+      height: 27
+    }
+  });
+
+  exports.default = Footer;
+},830,[109,12,292,816],"juxerhost/app/components/footer.js");
 require(23);
 require(11);
 //# sourceMappingURL=index.map

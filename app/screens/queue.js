@@ -8,7 +8,6 @@ import {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { paramsForServer } from 'feathers-hooks-common';
-import Spotify from 'rn-spotify-sdk';
 
 import api from '../api';
 import Track from '../components/track';
@@ -29,7 +28,7 @@ class Queue extends Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.container}>
         <FlatList
           style={styles.playlists}
           data={this.props.event.queue}
@@ -75,6 +74,9 @@ Queue.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   playlists: {
     height: '80%',
     width: '100%',

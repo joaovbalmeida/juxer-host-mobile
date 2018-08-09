@@ -1,11 +1,11 @@
 import { createSwitchNavigator } from 'react-navigation';
 
 import EventsStack from './events';
-import PlayerStack from './player';
+import PlayerScreen from '../screens/player';
 
 const AppStack = createSwitchNavigator({
   Events: EventsStack,
-  Player: PlayerStack,
+  Player: PlayerScreen,
 }, {
   initialRouteName: 'Events',
 });
