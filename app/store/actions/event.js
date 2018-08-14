@@ -47,9 +47,15 @@ const resetQueue = () => (
   }
 );
 
-const forwardTrack = () => (
+const resetIndex = () => (
   {
-    type: 'FORWARD_TRACK',
+    type: 'RESET_INDEX',
+  }
+);
+
+const increaseIndex = () => (
+  {
+    type: 'INCREASE_INDEX',
   }
 );
 
@@ -135,7 +141,7 @@ const stopEvent = event => (
 
     api.events.removeListener('updated', updateEventCallback);
 
-    return api.events.patch(event, { active: false }, paramsForServer({
+    return api.events.patch(event, { active: false, queue: [] }, paramsForServer({
       user: store.getState().auth.user.data,
     })).then(response => response, error => error);
   }
@@ -149,5 +155,6 @@ export default {
   stopEvent,
   createEvent,
   resetQueue,
-  forwardTrack,
+  resetIndex,
+  increaseIndex,
 };

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Tick from '../assets/images/tick.png';
+import Placeholder from '../assets/images/coverPlaceholder.png';
 
 const Player = ({
   name,
@@ -27,24 +27,35 @@ const Player = ({
     visible={visible}
   >
     <View style={styles.container}>
-      <View>
+      <View style={styles.top}>
         <TouchableOpacity
           onPress={hide}
         >
           <View style={{ padding: 15 }}>
             <Image
               style={styles.upArrow}
-              source={Tick}
+              source={Placeholder}
             />
           </View>
         </TouchableOpacity>
       </View>
-      <Image
-        style={{ height: 150, width: 150, alignSelf: 'center', borderRadius: 10 }}
-        source={Tick}
-      />
-      <Text>Thunder</Text>
-      <Text>Imagine Dragons</Text>
+      <View style={styles.mid}>
+        <Image
+          style={{ height: 150, width: 150, alignSelf: 'center', borderRadius: 10 }}
+          source={cover || Placeholder}
+        />
+        <Text>
+          {name}
+        </Text>
+        <Text>
+          {artist}
+          -
+          {album}
+        </Text>
+        <Text>
+          {owner}
+        </Text>
+      </View>
     </View>
   </Modal>
 );
@@ -53,15 +64,30 @@ Player.propTypes = {
   name: PropTypes.string.isRequired,
   artist: PropTypes.string.isRequired,
   album: PropTypes.string.isRequired,
-  cover: PropTypes.string.isRequired,
+  cover: PropTypes.string,
+  owner: PropTypes.string.isRequired,
   visible: PropTypes.bool.isRequired,
   hide: PropTypes.func.isRequired,
+};
+
+Player.defaultProps = {
+  cover: Placeholder,
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#222222',
+    backgroundColor: '#0E1214',
+  },
+  top: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+  },
+  mid: {
+    alignItems: 'center',
   },
   upArrow: {
     width: 20,

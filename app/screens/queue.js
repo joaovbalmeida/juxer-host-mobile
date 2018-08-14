@@ -22,11 +22,8 @@ class Queue extends Component {
     title: 'Evento',
   });
 
-  componentWillUnmount() {
-    this.props.stopEvent(this.props.event._id); // eslint-disable-line
-  }
-
   render() {
+    console.log(this.props.event);
     return (
       <View style={styles.container}>
         <FlatList
@@ -63,9 +60,8 @@ class Queue extends Component {
 }
 
 Queue.propTypes = {
-  stopEvent: PropTypes.func.isRequired,
   event: PropTypes.shape({
-    queue: PropTypes.array.isRequired,
+    queue: PropTypes.array,
   }).isRequired,
   user: PropTypes.shape({}).isRequired,
   navigation: PropTypes.shape({
@@ -75,30 +71,10 @@ Queue.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0,
   },
   playlists: {
-    height: '80%',
-    width: '100%',
     paddingVertical: 5,
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    height: 200,
-    width: '100%',
-  },
-  rightView: {
-    flex: 1,
-    paddingRight: 10,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingBottom: 50,
-  },
-  picker: {
-    height: 40,
-    width: '100%',
-    borderColor: 'gray',
-    borderWidth: 1,
   },
 });
 

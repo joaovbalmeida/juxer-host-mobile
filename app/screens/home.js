@@ -33,8 +33,12 @@ class Home extends Component {
   });
 
   componentDidMount() {
-    this.props.fetchUserPlaylists();
-    this.props.fetchUserEvents();
+    if (this.props.event.length) {
+      this.props.navigation.navigate('Player');
+    } else {
+      this.props.fetchUserPlaylists();
+      this.props.fetchUserEvents();
+    }
   }
 
   render() {
@@ -94,6 +98,9 @@ Home.propTypes = {
   events: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({}).isRequired).isRequired,
   }).isRequired,
+  event: PropTypes.shape({
+    length: PropTypes.number,
+  }).isRequired,
   logout: PropTypes.func.isRequired,
   sptLogout: PropTypes.func.isRequired,
   fetchUserPlaylists: PropTypes.func.isRequired,
@@ -116,6 +123,7 @@ const HomeConnector = connect(state => (
   {
     playlists: state.spotify.userPlaylists,
     events: state.event.userEvents,
+    event: state.event.event.data,
   }
 ), dispatch => (
   {

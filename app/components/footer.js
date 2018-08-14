@@ -28,10 +28,10 @@ const Footer = ({
     </TouchableOpacity>
     <TouchableOpacity onPress={show}>
       <View style={{ alignItems: 'center' }}>
-        <Text style={styles.playerTextTitle}>
+        <Text style={styles.playerTitle}>
           {name}
         </Text>
-        <Text style={styles.playerTextYear}>
+        <Text style={styles.playerArtist}>
           {artist}
         </Text>
       </View>
@@ -57,10 +57,16 @@ const styles = StyleSheet.create({
     bottom: 49,
     height: 50,
     width: '100%',
-    backgroundColor: '#222222',
+    backgroundColor: '#0E1214',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  playerTitle: {
+    color: 'white',
+  },
+  playerArtist: {
+    color: 'white',
   },
   upArrow: {
     width: 20,
