@@ -61624,7 +61624,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   }, {
     initialRouteName: 'Loading'
   });
-},525,[526,644,811,830],"juxerhost/app/routes/index.js");
+},525,[526,644,811,832],"juxerhost/app/routes/index.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = {
     get createNavigationContainer() {
@@ -99183,14 +99183,15 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
       var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, props));
 
-      if (props.event.queue) {
+      if (props.event.queue.length) {
         _this.state = {
           visible: false,
           name: props.event.queue[0].name,
           artist: props.event.queue[0].artist,
           album: props.event.queue[0].album,
           cover: props.event.queue[0].cover,
-          owner: props.event.queue[0].owner
+          owner: props.event.queue[0].owner,
+          playing: false
         };
       } else {
         _this.state = {
@@ -99199,12 +99200,15 @@ __d(function (global, require, module, exports, _dependencyMap) {
           artist: '',
           album: '',
           cover: null,
-          owner: ''
+          owner: '',
+          playing: false
         };
       }
 
       _this.show = _this.show.bind(_this);
       _this.hide = _this.hide.bind(_this);
+      _this.stop = _this.stop.bind(_this);
+      _this.forward = _this.forward.bind(_this);
       return _this;
     }
 
@@ -99212,10 +99216,6 @@ __d(function (global, require, module, exports, _dependencyMap) {
       key: "componentDidMount",
       value: function componentDidMount() {
         var _this2 = this;
-
-        if (this.props.event.queue) {
-          _rnSpotifySdk2.default.playURI(this.props.event.queue[0].uri, 0, 0);
-        }
 
         _rnSpotifySdk2.default.on('metadataChange', function (data) {
           if (data.state.playing) {
@@ -99230,8 +99230,6 @@ __d(function (global, require, module, exports, _dependencyMap) {
         });
 
         _rnSpotifySdk2.default.on('trackDelivered', function (data) {
-          console.log(_this2.props.index);
-
           if (_this2.props.index + 1 < _this2.props.event.queue.length) {
             _this2.props.increaseIndex();
 
@@ -99240,6 +99238,22 @@ __d(function (global, require, module, exports, _dependencyMap) {
             }
           }
         });
+
+        _rnSpotifySdk2.default.on('pause', function () {
+          _this2.setState({
+            playing: false
+          });
+        });
+
+        _rnSpotifySdk2.default.on('play', function () {
+          _this2.setState({
+            playing: true
+          });
+        });
+
+        if (this.props.event.queue.length) {
+          _rnSpotifySdk2.default.playURI(this.props.event.queue[0].uri, 0, 0);
+        }
       }
     }, {
       key: "componentWillUnmount",
@@ -99267,6 +99281,20 @@ __d(function (global, require, module, exports, _dependencyMap) {
         });
       }
     }, {
+      key: "forward",
+      value: function forward() {
+        this.setState({
+          visible: false
+        });
+      }
+    }, {
+      key: "stop",
+      value: function stop() {
+        this.setState({
+          visible: false
+        });
+      }
+    }, {
       key: "render",
       value: function render() {
         return _react3.default.createElement(
@@ -99275,23 +99303,30 @@ __d(function (global, require, module, exports, _dependencyMap) {
             style: styles.container,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 101
+              lineNumber: 120
             }
           },
           _react3.default.createElement(_player2.default, {
             navigation: this.props.navigation,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 102
+              lineNumber: 121
             }
           }),
           _react3.default.createElement(_footer2.default, {
             name: this.state.name,
             artist: this.state.artist,
             show: this.show,
+            playing: this.state.playing,
+            play: function play() {
+              return _rnSpotifySdk2.default.setPlaying(true);
+            },
+            pause: function pause() {
+              return _rnSpotifySdk2.default.setPlaying(false);
+            },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 103
+              lineNumber: 122
             }
           }),
           _react3.default.createElement(_player4.default, {
@@ -99302,9 +99337,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
             visible: this.state.visible,
             hide: this.hide,
             cover: this.state.cover,
+            play: function play() {
+              return _rnSpotifySdk2.default.setPlaying(true);
+            },
+            pause: function pause() {
+              return _rnSpotifySdk2.default.setPlaying(false);
+            },
+            stop: this.stop,
+            forward: this.forward,
+            playing: this.state.playing,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 108
+              lineNumber: 130
             }
           })
         );
@@ -99356,7 +99400,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Player);
   exports.default = PlayerConnector;
-},824,[109,128,12,490,292,729,825,828,829,646],"juxerhost/app/screens/player.js");
+},824,[109,128,12,490,292,729,825,828,831,646],"juxerhost/app/screens/player.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99461,14 +99505,13 @@ __d(function (global, require, module, exports, _dependencyMap) {
       value: function render() {
         var _this2 = this;
 
-        console.log(this.props.event);
         return _react3.default.createElement(
           _reactNative.View,
           {
             style: styles.container,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 28
+              lineNumber: 27
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -99486,7 +99529,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                 owner: item.owner,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 33
+                  lineNumber: 32
                 }
               });
             },
@@ -99495,7 +99538,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 29
+              lineNumber: 28
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
@@ -99504,23 +99547,21 @@ __d(function (global, require, module, exports, _dependencyMap) {
               _api2.default.events.patch(_this2.props.event._id, {
                 $push: {
                   queue: {
-                    name: 'Baby Im Yours (feat. Irfane)',
-                    album: 'By Your Side',
-                    artist: 'Breakbot',
+                    name: 'Mr Blue Sky',
+                    album: 'Out of the Blue',
+                    artist: 'Electric Light Orchestra',
                     cover: 'https://i.scdn.co/image/1c4bacfab0e2fc59ea1f400bac4b57d9382476f5',
                     owner: 'joaovbalmeida',
-                    uri: 'spotify:track:4qPTaehSZWKeaIgiIyprLs'
+                    uri: 'spotify:track:2RlgNHKcydI9sayD2Df2xp'
                   }
                 }
               }, (0, _feathersHooksCommon.paramsForServer)({
                 user: _this2.props.user
-              })).then(function (oi) {
-                return console.log(oi);
-              });
+              }));
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 44
+              lineNumber: 43
             }
           })
         );
@@ -99713,6 +99754,30 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _coverPlaceholder2 = _interopRequireDefault(_coverPlaceholder);
 
+  var _arrowDown = require(_dependencyMap[4], "../assets/images/arrowDown.png");
+
+  var _arrowDown2 = _interopRequireDefault(_arrowDown);
+
+  var _pause = require(_dependencyMap[5], "../assets/images/pause.png");
+
+  var _pause2 = _interopRequireDefault(_pause);
+
+  var _play = require(_dependencyMap[6], "../assets/images/play.png");
+
+  var _play2 = _interopRequireDefault(_play);
+
+  var _stop = require(_dependencyMap[7], "../assets/images/stop.png");
+
+  var _stop2 = _interopRequireDefault(_stop);
+
+  var _forward = require(_dependencyMap[8], "../assets/images/forward.png");
+
+  var _forward2 = _interopRequireDefault(_forward);
+
+  var _imageButton = require(_dependencyMap[9], "./imageButton");
+
+  var _imageButton2 = _interopRequireDefault(_imageButton);
+
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   var Player = function Player(_ref) {
@@ -99722,7 +99787,12 @@ __d(function (global, require, module, exports, _dependencyMap) {
         cover = _ref.cover,
         owner = _ref.owner,
         visible = _ref.visible,
-        hide = _ref.hide;
+        hide = _ref.hide,
+        play = _ref.play,
+        pause = _ref.pause,
+        stop = _ref.stop,
+        forward = _ref.forward,
+        playing = _ref.playing;
     return _react2.default.createElement(
       _reactNative.Modal,
       {
@@ -99731,16 +99801,23 @@ __d(function (global, require, module, exports, _dependencyMap) {
         visible: visible,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 24
+          lineNumber: 35
         }
       },
+      _react2.default.createElement(_reactNative.StatusBar, {
+        hidden: true,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 40
+        }
+      }),
       _react2.default.createElement(
         _reactNative.View,
         {
           style: styles.container,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 29
+            lineNumber: 41
           }
         },
         _react2.default.createElement(
@@ -99749,68 +99826,46 @@ __d(function (global, require, module, exports, _dependencyMap) {
             style: styles.top,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 30
-            }
-          },
-          _react2.default.createElement(
-            _reactNative.TouchableOpacity,
-            {
-              onPress: hide,
-              __source: {
-                fileName: _jsxFileName,
-                lineNumber: 31
-              }
-            },
-            _react2.default.createElement(
-              _reactNative.View,
-              {
-                style: {
-                  padding: 15
-                },
-                __source: {
-                  fileName: _jsxFileName,
-                  lineNumber: 34
-                }
-              },
-              _react2.default.createElement(_reactNative.Image, {
-                style: styles.upArrow,
-                source: _coverPlaceholder2.default,
-                __source: {
-                  fileName: _jsxFileName,
-                  lineNumber: 35
-                }
-              })
-            )
-          )
-        ),
-        _react2.default.createElement(
-          _reactNative.View,
-          {
-            style: styles.mid,
-            __source: {
-              fileName: _jsxFileName,
               lineNumber: 42
             }
           },
-          _react2.default.createElement(_reactNative.Image, {
-            style: {
-              height: 150,
-              width: 150,
-              alignSelf: 'center',
-              borderRadius: 10
-            },
-            source: cover || _coverPlaceholder2.default,
+          _react2.default.createElement(_imageButton2.default, {
+            onPress: hide,
+            image: _arrowDown2.default,
+            height: 13,
+            width: 20,
             __source: {
               fileName: _jsxFileName,
               lineNumber: 43
             }
-          }),
+          })
+        ),
+        _react2.default.createElement(_reactNative.Image, {
+          style: styles.cover,
+          source: cover ? {
+            uri: cover
+          } : _coverPlaceholder2.default,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 50
+          }
+        }),
+        _react2.default.createElement(
+          _reactNative.View,
+          {
+            style: styles.bottom,
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 54
+            }
+          },
           _react2.default.createElement(
             _reactNative.Text,
             {
+              style: styles.name,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 47
+                lineNumber: 55
               }
             },
             name
@@ -99818,24 +99873,66 @@ __d(function (global, require, module, exports, _dependencyMap) {
           _react2.default.createElement(
             _reactNative.Text,
             {
+              style: styles.artist,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 50
+                lineNumber: 58
               }
             },
             artist,
-            "-",
+            ' - ',
             album
           ),
           _react2.default.createElement(
             _reactNative.Text,
             {
+              style: styles.owner,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 55
+                lineNumber: 63
               }
             },
             owner
+          ),
+          _react2.default.createElement(
+            _reactNative.View,
+            {
+              style: styles.controls,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 66
+              }
+            },
+            _react2.default.createElement(_imageButton2.default, {
+              onPress: stop,
+              image: _stop2.default,
+              height: 25,
+              width: 25,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 67
+              }
+            }),
+            _react2.default.createElement(_imageButton2.default, {
+              onPress: playing ? pause : play,
+              image: playing ? _pause2.default : _play2.default,
+              height: 45,
+              width: playing ? 26 : 40,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 73
+              }
+            }),
+            _react2.default.createElement(_imageButton2.default, {
+              onPress: forward,
+              image: _forward2.default,
+              height: 18,
+              width: 30,
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 79
+              }
+            })
           )
         )
       )
@@ -99849,7 +99946,12 @@ __d(function (global, require, module, exports, _dependencyMap) {
     cover: _propTypes2.default.string,
     owner: _propTypes2.default.string.isRequired,
     visible: _propTypes2.default.bool.isRequired,
-    hide: _propTypes2.default.func.isRequired
+    hide: _propTypes2.default.func.isRequired,
+    play: _propTypes2.default.func.isRequired,
+    pause: _propTypes2.default.func.isRequired,
+    stop: _propTypes2.default.func.isRequired,
+    forward: _propTypes2.default.func.isRequired,
+    playing: _propTypes2.default.bool.isRequired
   };
   Player.defaultProps = {
     cover: _coverPlaceholder2.default
@@ -99858,21 +99960,62 @@ __d(function (global, require, module, exports, _dependencyMap) {
   var styles = _reactNative.StyleSheet.create({
     container: {
       flex: 1,
+      alignItems: 'center',
       backgroundColor: '#0E1214'
     },
     top: {
+      width: '100%',
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 10,
       paddingVertical: 20
     },
-    mid: {
+    bottom: {
+      width: '100%',
+      alignItems: 'center',
+      paddingHorizontal: 10,
+      paddingVertical: 10
+    },
+    controls: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
       alignItems: 'center'
     },
-    upArrow: {
-      width: 20,
-      height: 20
+    arrow: {
+      padding: 15
+    },
+    arrowImage: {
+      width: 13,
+      height: 8
+    },
+    cover: {
+      width: '80%',
+      aspectRatio: 1,
+      alignSelf: 'center'
+    },
+    name: {
+      paddingTop: 5,
+      paddingBottom: 2,
+      fontFamily: 'Raleway',
+      fontWeight: '600',
+      fontSize: 18,
+      color: 'white'
+    },
+    artist: {
+      paddingBottom: 5,
+      paddingTop: 2,
+      fontFamily: 'Raleway',
+      fontWeight: '600',
+      fontSize: 15,
+      color: 'lightgrey'
+    },
+    owner: {
+      paddingVertical: 5,
+      fontFamily: 'Raleway',
+      fontWeight: '600',
+      fontSize: 15,
+      color: '#ff005A'
     },
     playArrow: {
       width: 27,
@@ -99881,7 +100024,86 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Player;
-},828,[109,12,292,814],"juxerhost/app/components/player.js");
+},828,[109,12,292,814,829,835,836,837,838,830],"juxerhost/app/components/player.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 20,
+    "height": 13,
+    "scales": [1],
+    "hash": "4105b7623c1c6c74e506c93ff78a040e",
+    "name": "arrowDown",
+    "type": "png"
+  });
+},829,[325],"juxerhost/app/assets/images/arrowDown.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  var _jsxFileName = "/Users/joaovbalmeida/Documents/reactnative/juxerhost/app/components/imageButton.js";
+
+  var _react = require(_dependencyMap[0], "react");
+
+  var _react2 = _interopRequireDefault(_react);
+
+  var _reactNative = require(_dependencyMap[1], "react-native");
+
+  var _propTypes = require(_dependencyMap[2], "prop-types");
+
+  var _propTypes2 = _interopRequireDefault(_propTypes);
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var ImageButton = function ImageButton(_ref) {
+    var image = _ref.image,
+        onPress = _ref.onPress,
+        height = _ref.height,
+        width = _ref.width;
+    return _react2.default.createElement(
+      _reactNative.TouchableOpacity,
+      {
+        onPress: onPress,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 15
+        }
+      },
+      _react2.default.createElement(
+        _reactNative.View,
+        {
+          style: {
+            padding: 15
+          },
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 16
+          }
+        },
+        _react2.default.createElement(_reactNative.Image, {
+          style: {
+            height: height,
+            width: width,
+            alignSelf: 'center'
+          },
+          source: image,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 17
+          }
+        })
+      )
+    );
+  };
+
+  ImageButton.propTypes = {
+    image: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.number]).isRequired,
+    onPress: _propTypes2.default.func.isRequired,
+    height: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.number]).isRequired,
+    width: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.number]).isRequired
+  };
+  exports.default = ImageButton;
+},830,[109,12,292],"juxerhost/app/components/imageButton.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99898,62 +100120,57 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var _propTypes2 = _interopRequireDefault(_propTypes);
 
-  var _tick = require(_dependencyMap[3], "../assets/images/tick.png");
+  var _imageButton = require(_dependencyMap[3], "./imageButton");
 
-  var _tick2 = _interopRequireDefault(_tick);
+  var _imageButton2 = _interopRequireDefault(_imageButton);
+
+  var _miniPlay = require(_dependencyMap[4], "../assets/images/miniPlay.png");
+
+  var _miniPlay2 = _interopRequireDefault(_miniPlay);
+
+  var _miniPause = require(_dependencyMap[5], "../assets/images/miniPause.png");
+
+  var _miniPause2 = _interopRequireDefault(_miniPause);
+
+  var _arrowUp = require(_dependencyMap[6], "../assets/images/arrowUp.png");
+
+  var _arrowUp2 = _interopRequireDefault(_arrowUp);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   var Footer = function Footer(_ref) {
     var name = _ref.name,
         artist = _ref.artist,
-        show = _ref.show;
+        show = _ref.show,
+        playing = _ref.playing,
+        play = _ref.play,
+        pause = _ref.pause;
     return _react2.default.createElement(
       _reactNative.Animated.View,
       {
         style: styles.container,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 20
+          lineNumber: 26
         }
       },
+      _react2.default.createElement(_imageButton2.default, {
+        onPress: show,
+        image: _arrowUp2.default,
+        height: 10,
+        width: 17,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 27
+        }
+      }),
       _react2.default.createElement(
         _reactNative.TouchableOpacity,
         {
           onPress: show,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 21
-          }
-        },
-        _react2.default.createElement(
-          _reactNative.View,
-          {
-            style: {
-              marginLeft: 15
-            },
-            __source: {
-              fileName: _jsxFileName,
-              lineNumber: 22
-            }
-          },
-          _react2.default.createElement(_reactNative.Image, {
-            style: styles.upArrow,
-            source: _tick2.default,
-            __source: {
-              fileName: _jsxFileName,
-              lineNumber: 23
-            }
-          })
-        )
-      ),
-      _react2.default.createElement(
-        _reactNative.TouchableOpacity,
-        {
-          onPress: show,
-          __source: {
-            fileName: _jsxFileName,
-            lineNumber: 29
+            lineNumber: 33
           }
         },
         _react2.default.createElement(
@@ -99964,7 +100181,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 30
+              lineNumber: 34
             }
           },
           _react2.default.createElement(
@@ -99973,7 +100190,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
               style: styles.playerTitle,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 31
+                lineNumber: 35
               }
             },
             name
@@ -99984,7 +100201,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
               style: styles.playerArtist,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 34
+                lineNumber: 38
               }
             },
             artist
@@ -99999,25 +100216,37 @@ __d(function (global, require, module, exports, _dependencyMap) {
           },
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 39
+            lineNumber: 43
           }
         },
         _react2.default.createElement(_reactNative.Image, {
-          style: styles.playArrow,
-          source: _tick2.default,
+          style: styles.play,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 40
+            lineNumber: 44
           }
         })
-      )
+      ),
+      _react2.default.createElement(_imageButton2.default, {
+        onPress: playing ? pause : play,
+        image: playing ? _miniPause2.default : _miniPlay2.default,
+        height: 20,
+        width: playing ? 12 : 18,
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 48
+        }
+      })
     );
   };
 
   Footer.propTypes = {
     name: _propTypes2.default.string.isRequired,
     artist: _propTypes2.default.string.isRequired,
-    show: _propTypes2.default.func.isRequired
+    show: _propTypes2.default.func.isRequired,
+    play: _propTypes2.default.func.isRequired,
+    pause: _propTypes2.default.func.isRequired,
+    playing: _propTypes2.default.bool.isRequired
   };
 
   var styles = _reactNative.StyleSheet.create({
@@ -100048,7 +100277,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Footer;
-},829,[109,12,292,816],"juxerhost/app/components/footer.js");
+},831,[109,12,292,830,840,841,839],"juxerhost/app/components/footer.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -100222,7 +100451,91 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Loading);
   exports.default = LoadingConnector;
-},830,[109,128,12,490,292,729,646],"juxerhost/app/screens/loading.js");
+},832,[109,128,12,490,292,729,646],"juxerhost/app/screens/loading.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 40,
+    "height": 42,
+    "scales": [1],
+    "hash": "b4dcdd67dc5e6a47731f0ed83e89887c",
+    "name": "pause",
+    "type": "png"
+  });
+},835,[325],"juxerhost/app/assets/images/pause.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 40,
+    "height": 46,
+    "scales": [1],
+    "hash": "64cd4d9f13de4b53b841260cdb70e896",
+    "name": "play",
+    "type": "png"
+  });
+},836,[325],"juxerhost/app/assets/images/play.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 25,
+    "height": 25,
+    "scales": [1],
+    "hash": "bd5a393681993d2275c6576fde4e74bf",
+    "name": "stop",
+    "type": "png"
+  });
+},837,[325],"juxerhost/app/assets/images/stop.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 22,
+    "height": 25,
+    "scales": [1],
+    "hash": "fde83ad539bd30df286d0402e820456a",
+    "name": "forward",
+    "type": "png"
+  });
+},838,[325],"juxerhost/app/assets/images/forward.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 20,
+    "height": 13,
+    "scales": [1],
+    "hash": "f87cda956767f3749a940e023feae002",
+    "name": "arrowUp",
+    "type": "png"
+  });
+},839,[325],"juxerhost/app/assets/images/arrowUp.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 18,
+    "height": 20,
+    "scales": [1],
+    "hash": "0e2984d34da92cb064d37501c907d631",
+    "name": "miniPlay",
+    "type": "png"
+  });
+},840,[325],"app/assets/images/miniPlay.png");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 12,
+    "height": 20,
+    "scales": [1],
+    "hash": "7ab7c527d913edc7c6a690cf824e0708",
+    "name": "miniPause",
+    "type": "png"
+  });
+},841,[325],"app/assets/images/miniPause.png");
 require(23);
 require(11);
 //# sourceMappingURL=index.map

@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':rn-spotify-sdk')
     compile project(':react-native-events')
     compile project(':rn-spotify-sdk')
     compile fileTree(dir: "libs", include: ["*.jar"])

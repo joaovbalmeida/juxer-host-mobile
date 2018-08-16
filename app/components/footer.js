@@ -10,22 +10,26 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Tick from '../assets/images/tick.png';
+import ImageButton from './imageButton';
+import Play from '../assets/images/miniPlay.png';
+import Pause from '../assets/images/miniPause.png';
+import UpArrow from '../assets/images/arrowUp.png';
 
 const Footer = ({
   name,
   artist,
   show,
+  playing,
+  play,
+  pause,
 }) => (
   <Animated.View style={styles.container}>
-    <TouchableOpacity onPress={show}>
-      <View style={{ marginLeft: 15 }}>
-        <Image
-          style={styles.upArrow}
-          source={Tick}
-        />
-      </View>
-    </TouchableOpacity>
+    <ImageButton
+      onPress={show}
+      image={UpArrow}
+      height={20}
+      width={20}
+    />
     <TouchableOpacity onPress={show}>
       <View style={{ alignItems: 'center' }}>
         <Text style={styles.playerTitle}>
@@ -38,10 +42,15 @@ const Footer = ({
     </TouchableOpacity>
     <View style={{ marginRight: 15 }}>
       <Image
-        style={styles.playArrow}
-        source={Tick}
+        style={styles.play}
       />
     </View>
+    <ImageButton
+      onPress={playing ? pause : play}
+      image={playing ? Pause : Play}
+      height={20}
+      width={playing ? 12 : 18}
+    />
   </Animated.View>
 );
 
@@ -49,6 +58,9 @@ Footer.propTypes = {
   name: PropTypes.string.isRequired,
   artist: PropTypes.string.isRequired,
   show: PropTypes.func.isRequired,
+  play: PropTypes.func.isRequired,
+  pause: PropTypes.func.isRequired,
+  playing: PropTypes.bool.isRequired,
 };
 
 const styles = StyleSheet.create({

@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -42,6 +41,11 @@
 		E97EA3D021002B1C004712F2 /* SpotifyAudioPlayback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97EA3CC21002AE8004712F2 /* SpotifyAudioPlayback.framework */; };
 		E97EA3D121002B1C004712F2 /* SpotifyAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97EA3CA21002AE8004712F2 /* SpotifyAuthentication.framework */; };
 		E97EA3D221002B1C004712F2 /* SpotifyMetadata.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97EA3CB21002AE8004712F2 /* SpotifyMetadata.framework */; };
+		D98E8189492441F18A1D83D1 /* Raleway-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9CBDDC73601B483B93BE5DF5 /* Raleway-Bold.ttf */; };
+		8A7299824EE04A6EA3F97234 /* Raleway-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34B9CE6367FD49199439964C /* Raleway-Light.ttf */; };
+		5B7FA03651A045F3985247A6 /* Raleway-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFC87F303119437D9A1B3EEE /* Raleway-Medium.ttf */; };
+		C392EF7029B9428A94C5CC8A /* Raleway-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0A06B953477E4349A2582B29 /* Raleway-Regular.ttf */; };
+		2A7A040D3F354E109E0BD988 /* Raleway-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EB70A0CFE74A4ACEAF6D14EC /* Raleway-SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -368,6 +372,11 @@
 		E97EA3CA21002AE8004712F2 /* SpotifyAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpotifyAuthentication.framework; path = "../node_modules/rn-spotify-sdk/ios/external/SpotifySDK/SpotifyAuthentication.framework"; sourceTree = "<group>"; };
 		E97EA3CB21002AE8004712F2 /* SpotifyMetadata.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpotifyMetadata.framework; path = "../node_modules/rn-spotify-sdk/ios/external/SpotifySDK/SpotifyMetadata.framework"; sourceTree = "<group>"; };
 		E97EA3CC21002AE8004712F2 /* SpotifyAudioPlayback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpotifyAudioPlayback.framework; path = "../node_modules/rn-spotify-sdk/ios/external/SpotifySDK/SpotifyAudioPlayback.framework"; sourceTree = "<group>"; };
+		9CBDDC73601B483B93BE5DF5 /* Raleway-Bold.ttf */ = {isa = PBXFileReference; name = "Raleway-Bold.ttf"; path = "../app/assets/fonts/Raleway-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		34B9CE6367FD49199439964C /* Raleway-Light.ttf */ = {isa = PBXFileReference; name = "Raleway-Light.ttf"; path = "../app/assets/fonts/Raleway-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		BFC87F303119437D9A1B3EEE /* Raleway-Medium.ttf */ = {isa = PBXFileReference; name = "Raleway-Medium.ttf"; path = "../app/assets/fonts/Raleway-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		0A06B953477E4349A2582B29 /* Raleway-Regular.ttf */ = {isa = PBXFileReference; name = "Raleway-Regular.ttf"; path = "../app/assets/fonts/Raleway-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		EB70A0CFE74A4ACEAF6D14EC /* Raleway-SemiBold.ttf */ = {isa = PBXFileReference; name = "Raleway-SemiBold.ttf"; path = "../app/assets/fonts/Raleway-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -613,6 +622,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				E97EA38F2100297E004712F2 /* Recovered References */,
+				9052E2EFFA4C460196717B8A /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -663,6 +673,19 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+		};
+		9052E2EFFA4C460196717B8A /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				9CBDDC73601B483B93BE5DF5 /* Raleway-Bold.ttf */,
+				34B9CE6367FD49199439964C /* Raleway-Light.ttf */,
+				BFC87F303119437D9A1B3EEE /* Raleway-Medium.ttf */,
+				0A06B953477E4349A2582B29 /* Raleway-Regular.ttf */,
+				EB70A0CFE74A4ACEAF6D14EC /* Raleway-SemiBold.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -1135,6 +1158,11 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				D98E8189492441F18A1D83D1 /* Raleway-Bold.ttf in Resources */,
+				8A7299824EE04A6EA3F97234 /* Raleway-Light.ttf in Resources */,
+				5B7FA03651A045F3985247A6 /* Raleway-Medium.ttf in Resources */,
+				C392EF7029B9428A94C5CC8A /* Raleway-Regular.ttf in Resources */,
+				2A7A040D3F354E109E0BD988 /* Raleway-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

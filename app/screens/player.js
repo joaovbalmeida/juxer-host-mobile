@@ -27,7 +27,7 @@ class Player extends Component {
 
   constructor(props) {
     super(props);
-    if (props.event.queue) {
+    if (props.event.queue.length) {
       this.state = {
         visible: false,
         name: props.event.queue[0].name,
@@ -35,6 +35,7 @@ class Player extends Component {
         album: props.event.queue[0].album,
         cover: props.event.queue[0].cover,
         owner: props.event.queue[0].owner,
+        playing: false,
       };
     } else {
       this.state = {
@@ -44,18 +45,17 @@ class Player extends Component {
         album: '',
         cover: null,
         owner: '',
+        playing: false,
       };
     }
 
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);
+    this.stop = this.stop.bind(this);
+    this.forward = this.forward.bind(this);
   }
 
   componentDidMount() {
-    if (this.props.event.queue) {
-      Spotify.playURI(this.props.event.queue[0].uri, 0, 0);
-    }
-
     Spotify.on('metadataChange', (data) => {
       if (data.state.playing) {
         this.setState({
@@ -69,7 +69,6 @@ class Player extends Component {
     });
 
     Spotify.on('trackDelivered', (data) => {
-      console.log(this.props.index);
       if (this.props.index + 1 < this.props.event.queue.length) {
         this.props.increaseIndex();
         if (!data.state.playing) {
@@ -77,6 +76,18 @@ class Player extends Component {
         }
       }
     });
+
+    Spotify.on('pause', () => {
+      this.setState({ playing: false });
+    });
+
+    Spotify.on('play', () => {
+      this.setState({ playing: true });
+    });
+
+    if (this.props.event.queue.length) {
+      Spotify.playURI(this.props.event.queue[0].uri, 0, 0);
+    }
   }
 
   componentWillUnmount() {
@@ -96,6 +107,14 @@ class Player extends Component {
     this.setState({ visible: false });
   }
 
+  forward() {
+    this.setState({ visible: false });
+  }
+
+  stop() {
+    this.setState({ visible: false });
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -104,6 +123,9 @@ class Player extends Component {
           name={this.state.name}
           artist={this.state.artist}
           show={this.show}
+          playing={this.state.playing}
+          play={() => Spotify.setPlaying(true)}
+          pause={() => Spotify.setPlaying(false)}
         />
         <PlayerComponent
           name={this.state.name}
@@ -113,6 +135,11 @@ class Player extends Component {
           visible={this.state.visible}
           hide={this.hide}
           cover={this.state.cover}
+          play={() => Spotify.setPlaying(true)}
+          pause={() => Spotify.setPlaying(false)}
+          stop={this.stop}
+          forward={this.forward}
+          playing={this.state.playing}
         />
       </View>
     );

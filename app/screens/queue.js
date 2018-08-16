@@ -23,7 +23,6 @@ class Queue extends Component {
   });
 
   render() {
-    console.log(this.props.event);
     return (
       <View style={styles.container}>
         <FlatList
@@ -45,13 +44,13 @@ class Queue extends Component {
           title="Criar Evento"
           onPress={() => {
             api.events.patch(this.props.event._id, { $push: { queue: {
-              name: 'Baby Im Yours (feat. Irfane)',
-              album: 'By Your Side',
-              artist: 'Breakbot',
+              name: 'Mr Blue Sky',
+              album: 'Out of the Blue',
+              artist: 'Electric Light Orchestra',
               cover: 'https://i.scdn.co/image/1c4bacfab0e2fc59ea1f400bac4b57d9382476f5',
               owner: 'joaovbalmeida',
-              uri: 'spotify:track:4qPTaehSZWKeaIgiIyprLs',
-            }}}, paramsForServer({ user: this.props.user })).then(oi => console.log(oi));
+              uri: 'spotify:track:2RlgNHKcydI9sayD2Df2xp',
+            }}}, paramsForServer({ user: this.props.user }));
           }}
         />
       </View>
