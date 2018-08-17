@@ -1,11 +1,13 @@
-import { createBottomTabNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation';
 
 import QueueScreen from '../screens/queue';
+import SettingsScreen from '../screens/settings';
 
-const PlayerTab = createBottomTabNavigator({
+const PlayerStack = createStackNavigator({
   Queue: QueueScreen,
+  Settings: SettingsScreen,
 }, {
   initialRouteName: 'Queue',
 });
 
-export default PlayerTab;
+export default PlayerStack;

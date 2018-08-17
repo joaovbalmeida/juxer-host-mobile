@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  StatusBar,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Spotify from 'rn-spotify-sdk';
 
-import PlayerTab from '../routes/player';
+import PlayerStack from '../routes/player';
 import PlayerComponent from '../components/player';
 import Footer from '../components/footer';
 import actions from '../store/actions';
@@ -19,7 +20,7 @@ const {
 } = actions;
 
 class Player extends Component {
-  static router = PlayerTab.router;
+  static router = PlayerStack.router;
 
   static navigationOptions = () => ({
     header: null,
@@ -118,7 +119,8 @@ class Player extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <PlayerTab navigation={this.props.navigation} />
+        <StatusBar barStyle="light-content" />
+        <PlayerStack navigation={this.props.navigation} />
         <Footer
           name={this.state.name}
           artist={this.state.artist}

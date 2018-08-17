@@ -17,19 +17,9 @@ const {
   stopEvent: stopEventAction,
 } = actions;
 
-class Queue extends Component {
+class Settings extends Component {
   static navigationOptions = () => ({
-    title: 'Fila',
-    headerStyle: {
-      backgroundColor: '#0E1214',
-      borderBottomWidth: 1,
-      borderColor: '#15191B',
-    },
-    headerTintColor: '#ff005a',
-    headerTitleStyle: {
-      fontFamily: 'Raleway',
-      fontWeight: '800',
-    },
+    title: 'Evento',
   });
 
   render() {
@@ -38,19 +28,15 @@ class Queue extends Component {
         <FlatList
           style={styles.playlists}
           data={this.props.event.queue}
-          renderItem={({ item, index }) => {
-            if (index === 0) return null;
-            return (
-              <Track
-                order={index.toString()}
-                name={item.name}
-                artist={item.artist}
-                cover={item.cover}
-                owner={item.owner}
-              />
-            );
-          }}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={({ item, index }) => (
+            <Track
+              order={index.toString()}
+              name={item.name}
+              artist={item.artist}
+              cover={item.cover}
+              owner={item.owner}
+            />
+          )}
           keyExtractor={item => item._id} // eslint-disable-line
         />
         <Button
@@ -71,7 +57,7 @@ class Queue extends Component {
   }
 }
 
-Queue.propTypes = {
+Settings.propTypes = {
   event: PropTypes.shape({
     queue: PropTypes.array,
   }).isRequired,
@@ -83,19 +69,14 @@ Queue.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0,
   },
   playlists: {
-    backgroundColor: '#15191B',
-  },
-  separator: {
-    width: '100%',
-    height: 1,
-    backgroundColor: '#15191B',
+    paddingVertical: 5,
   },
 });
 
-const QueueConnector = connect(state => (
+const SettingsConnector = connect(state => (
   {
     event: state.event.event.data,
     user: state.auth.user.data,
@@ -106,6 +87,6 @@ const QueueConnector = connect(state => (
       dispatch(stopEventAction(event))
     ),
   }
-))(Queue);
+))(Settings);
 
-export default QueueConnector;
+export default SettingsConnector;

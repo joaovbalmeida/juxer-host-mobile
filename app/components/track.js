@@ -11,12 +11,11 @@ const Track = ({
   order,
   name,
   artist,
-  album,
   cover,
   owner,
 }) => (
   <View style={styles.container}>
-    <Text>
+    <Text style={styles.order}>
       {order}
     </Text>
     <Image
@@ -25,15 +24,13 @@ const Track = ({
       source={{ uri: cover }}
     />
     <View style={styles.rightSection}>
-      <Text>
+      <Text style={styles.name}>
         {name}
       </Text>
-      <Text>
+      <Text style={styles.artist}>
         {artist}
-         -
-        {album}
       </Text>
-      <Text>
+      <Text style={styles.owner}>
         {owner}
       </Text>
     </View>
@@ -44,7 +41,6 @@ Track.propTypes = {
   order: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   artist: PropTypes.string.isRequired,
-  album: PropTypes.string.isRequired,
   cover: PropTypes.string.isRequired,
   owner: PropTypes.string.isRequired,
 };
@@ -54,14 +50,44 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 80,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'flex-start',
     alignItems: 'center',
+    backgroundColor: '#0E1214',
   },
   image: {
-    height: 60,
-    width: 60,
+    height: 65,
+    width: 65,
+  },
+  order: {
+    color: 'white',
+    fontFamily: 'Raleway',
+    fontSize: 20,
+    width: 50,
+    marginHorizontal: 5,
+    textAlign: 'center',
+  },
+  name: {
+    color: 'white',
+    fontFamily: 'Raleway',
+    fontWeight: '600',
+    fontSize: 15,
+    paddingBottom: 2,
+  },
+  artist: {
+    color: 'white',
+    fontFamily: 'Raleway',
+    fontWeight: '500',
+    fontSize: 14,
+    paddingBottom: 6,
+  },
+  owner: {
+    fontFamily: 'Raleway',
+    fontWeight: '600',
+    color: '#ff005a',
   },
   rightSection: {
+    marginLeft: 8,
+    marginRight: 5,
   },
 });
 

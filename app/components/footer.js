@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import ImageButton from './imageButton';
 import Play from '../assets/images/miniPlay.png';
 import Pause from '../assets/images/miniPause.png';
 import UpArrow from '../assets/images/arrowUp.png';
@@ -24,33 +23,35 @@ const Footer = ({
   pause,
 }) => (
   <Animated.View style={styles.container}>
-    <ImageButton
+    <TouchableOpacity onPress={show} style={styles.button}>
+      <Image style={styles.upArror} source={UpArrow} />
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.labels}
       onPress={show}
-      image={UpArrow}
-      height={20}
-      width={20}
-    />
-    <TouchableOpacity onPress={show}>
-      <View style={{ alignItems: 'center' }}>
-        <Text style={styles.playerTitle}>
-          {name}
-        </Text>
-        <Text style={styles.playerArtist}>
-          {artist}
-        </Text>
-      </View>
+    >
+      <Text style={styles.playerTitle}>
+        {name}
+      </Text>
+      <Text style={styles.playerArtist}>
+        {artist}
+      </Text>
     </TouchableOpacity>
     <View style={{ marginRight: 15 }}>
       <Image
         style={styles.play}
       />
     </View>
-    <ImageButton
-      onPress={playing ? pause : play}
-      image={playing ? Pause : Play}
-      height={20}
-      width={playing ? 12 : 18}
-    />
+    <TouchableOpacity onPress={playing ? pause : play} style={styles.button}>
+      <Image
+        style={{
+          alignSelf: 'center',
+          height: 20,
+          width: playing ? 12 : 18,
+        }}
+        source={playing ? Pause : Play}
+      />
+    </TouchableOpacity>
   </Animated.View>
 );
 
@@ -65,8 +66,6 @@ Footer.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    bottom: 49,
     height: 50,
     width: '100%',
     backgroundColor: '#0E1214',
@@ -74,19 +73,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  labels: {
+    flex: 1,
+    marginLeft: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   playerTitle: {
+    fontFamily: 'Raleway',
+    fontWeight: '600',
     color: 'white',
   },
   playerArtist: {
     color: 'white',
+    fontFamily: 'Raleway',
+    fontWeight: '500',
+  },
+  button: {
+    height: '100%',
+    width: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   upArrow: {
     width: 20,
     height: 20,
-  },
-  playArrow: {
-    width: 27,
-    height: 27,
   },
 });
 
