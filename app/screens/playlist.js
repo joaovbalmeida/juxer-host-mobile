@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
 
 const PlaylistConnector = connect(state => (
   {
-    playlists: state.spotify.playlists,
+    playlists: state.spotify.userPlaylists,
   }
 ), dispatch => (
   {

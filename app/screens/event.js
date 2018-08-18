@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 
 const EventConnector = connect(state => (
   {
-    playlists: state.spotify.playlists,
+    playlists: state.spotify.userPlaylists,
   }
 ), dispatch => (
   {

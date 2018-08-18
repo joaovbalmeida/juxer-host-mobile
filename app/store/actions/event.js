@@ -47,18 +47,6 @@ const resetQueue = () => (
   }
 );
 
-const resetIndex = () => (
-  {
-    type: 'RESET_INDEX',
-  }
-);
-
-const increaseIndex = () => (
-  {
-    type: 'INCREASE_INDEX',
-  }
-);
-
 const updateEventCallback = (data) => {
   store.dispatch(receiveEvent(data));
 };
@@ -77,13 +65,9 @@ const createEvent = event => (
     })).then((response) => {
       dispatch(receiveEvent(response));
 
-      api.events.on('patched', (data) => {
-        dispatch(receiveEvent(data));
-      });
+      api.events.on('patched', updateEventCallback);
 
-      api.events.on('updated', (data) => {
-        dispatch(receiveEvent(data));
-      });
+      api.events.on('updated', updateEventCallback);
 
       return response;
     }, (error) => {
@@ -127,13 +111,21 @@ const startEvent = event => (
 
       return response;
     }, (error) => {
-      dispatch(requestEvent({}));
+      dispatch(receiveEvent({}));
       return error;
     });
   }
 );
 
-const stopEvent = event => (
+const clearEvent = event => (
+  () => (
+    api.events.patch(event, { queue: [], index: 0 }, paramsForServer({
+      user: store.getState().auth.user.data,
+    })).then(response => response, error => error)
+  )
+);
+
+const pauseEvent = event => (
   (dispatch) => {
     dispatch(resetEvent());
 
@@ -141,10 +133,18 @@ const stopEvent = event => (
 
     api.events.removeListener('updated', updateEventCallback);
 
-    return api.events.patch(event, { active: false, queue: [] }, paramsForServer({
+    return api.events.patch(event, { active: false }, paramsForServer({
       user: store.getState().auth.user.data,
     })).then(response => response, error => error);
   }
+);
+
+const increaseIndex = (event, index) => (
+  () => (
+    api.events.patch(event, { index }, paramsForServer({
+      user: store.getState().auth.user.data,
+    })).then(response => response, error => error)
+  )
 );
 
 export default {
@@ -152,9 +152,9 @@ export default {
   resetUserEvents,
   startEvent,
   resetEvent,
-  stopEvent,
+  clearEvent,
   createEvent,
   resetQueue,
-  resetIndex,
   increaseIndex,
+  pauseEvent,
 };

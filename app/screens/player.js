@@ -3,6 +3,7 @@ import {
   StyleSheet,
   View,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -14,9 +15,9 @@ import Footer from '../components/footer';
 import actions from '../store/actions';
 
 const {
-  stopEvent: stopEventAction,
   increaseIndex: increaseIndexAction,
-  resetIndex: resetIndexAction,
+  pauseEvent: pauseEventAction,
+  clearEvent: clearEventAction,
 } = actions;
 
 class Player extends Component {
@@ -28,53 +29,45 @@ class Player extends Component {
 
   constructor(props) {
     super(props);
-    if (props.event.queue.length) {
-      this.state = {
-        visible: false,
-        name: props.event.queue[0].name,
-        artist: props.event.queue[0].artist,
-        album: props.event.queue[0].album,
-        cover: props.event.queue[0].cover,
-        owner: props.event.queue[0].owner,
-        playing: false,
-      };
-    } else {
-      this.state = {
-        visible: false,
-        name: '',
-        artist: '',
-        album: '',
-        cover: null,
-        owner: '',
-        playing: false,
-      };
-    }
+    this.state = {
+      visible: false,
+      name: '',
+      artist: '',
+      album: '',
+      cover: null,
+      owner: '',
+      playing: false,
+    };
 
     this.show = this.show.bind(this);
     this.hide = this.hide.bind(this);
     this.stop = this.stop.bind(this);
+    this.play = this.play.bind(this);
+    this.clear = this.clear.bind(this);
+    this.pause = this.pause.bind(this);
     this.forward = this.forward.bind(this);
   }
 
   componentDidMount() {
+    const { queue, index } = this.props.event;
+
     Spotify.on('metadataChange', (data) => {
-      if (data.state.playing) {
+      if (data.metadata.currentTrack) {
         this.setState({
           name: data.metadata.currentTrack.name,
           artist: data.metadata.currentTrack.artistName,
           album: data.metadata.currentTrack.albumName,
           cover: data.metadata.currentTrack.albumCoverArtURL,
-          owner: this.props.event.queue[this.props.index].owner,
+          owner: queue.length >= index + 1 ? queue[index].owner : '',
         });
       }
     });
 
-    Spotify.on('trackDelivered', (data) => {
-      if (this.props.index + 1 < this.props.event.queue.length) {
-        this.props.increaseIndex();
-        if (!data.state.playing) {
-          Spotify.playURI(this.props.event.queue[this.props.index].uri, 0, 0);
-        }
+    Spotify.on('trackDelivered', () => {
+      if (index + 1 < queue.length) {
+        this.skipTrack();
+      } else if (index + 1 === queue.length) {
+        this.props.increaseIndex(this.props.event._id, index + 1); // eslint-disable-line
       }
     });
 
@@ -86,18 +79,79 @@ class Player extends Component {
       this.setState({ playing: true });
     });
 
-    if (this.props.event.queue.length) {
-      Spotify.playURI(this.props.event.queue[0].uri, 0, 0);
+    if (queue.length >= index + 1) {
+      Spotify.playURI(queue[index].uri, 0, 0);
     }
   }
 
   componentWillUnmount() {
-    this.resetPlayer();
+    Spotify.setPlaying(false);
+    this.props.pauseEvent(this.props.event._id); // eslint-disable-line
   }
 
-  resetPlayer() {
-    this.props.resetIndex();
-    this.props.stopEvent(this.props.event._id); // eslint-disable-line
+  componentWillReceiveProps(nextProps) {
+    const { queue, index } = nextProps.event;
+    if (queue) {
+      if ((queue.length >= index + 1) && !this.state.playing) {
+        Spotify.playURI(queue[index].uri, 0, 0);
+      }
+    }
+  }
+
+  skipTrack() {
+    const { queue, index, _id } = this.props.event;
+    this.props.increaseIndex(_id, index + 1)
+      .then(() => {
+        Spotify.playURI(queue[index].uri, 0, 0);
+      });
+  }
+
+  forward() {
+    if (this.props.event.index + 1 < this.props.event.queue.length) {
+      this.skipTrack();
+    }
+  }
+
+  play() {
+    const { queue, index } = this.props.event;
+    if (queue.length >= index + 1) Spotify.setPlaying(true);
+  }
+
+  pause() {
+    const { queue, index } = this.props.event;
+    if (queue.length >= index + 1) Spotify.setPlaying(false);
+  }
+
+  stop() {
+    Alert.alert(
+      'Sair do Evento?',
+      'Tem certeza que deseja parar o evento?',
+      [
+        { text: 'Não', style: 'cancel' },
+        {
+          text: 'Sim',
+          onPress: () => {
+            Spotify.setPlaying(false);
+            this.props.pauseEvent(this.props.event._id) // eslint-disable-line
+              .then(() => this.props.navigation.navigate('Events'));
+          },
+        },
+      ],
+    );
+  }
+
+  clear() {
+    Spotify.setPlaying(false);
+    this.props.clearEvent(this.props.event._id); // eslint-disable-line
+    this.setState({
+      visible: false,
+      name: '',
+      artist: '',
+      album: '',
+      cover: null,
+      owner: '',
+      playing: false,
+    });
   }
 
   show() {
@@ -108,26 +162,21 @@ class Player extends Component {
     this.setState({ visible: false });
   }
 
-  forward() {
-    this.setState({ visible: false });
-  }
-
-  stop() {
-    this.setState({ visible: false });
-  }
-
   render() {
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
-        <PlayerStack navigation={this.props.navigation} />
+        <PlayerStack
+          navigation={this.props.navigation}
+          screenProps={{ clear: this.clear }}
+        />
         <Footer
           name={this.state.name}
           artist={this.state.artist}
           show={this.show}
           playing={this.state.playing}
-          play={() => Spotify.setPlaying(true)}
-          pause={() => Spotify.setPlaying(false)}
+          play={this.play}
+          pause={this.pause}
         />
         <PlayerComponent
           name={this.state.name}
@@ -137,8 +186,8 @@ class Player extends Component {
           visible={this.state.visible}
           hide={this.hide}
           cover={this.state.cover}
-          play={() => Spotify.setPlaying(true)}
-          pause={() => Spotify.setPlaying(false)}
+          play={this.play}
+          pause={this.pause}
           stop={this.stop}
           forward={this.forward}
           playing={this.state.playing}
@@ -149,13 +198,13 @@ class Player extends Component {
 }
 
 Player.propTypes = {
-  stopEvent: PropTypes.func.isRequired,
+  clearEvent: PropTypes.func.isRequired,
   increaseIndex: PropTypes.func.isRequired,
-  resetIndex: PropTypes.func.isRequired,
+  pauseEvent: PropTypes.func.isRequired,
   event: PropTypes.shape({
     queue: PropTypes.array,
+    index: PropTypes.number,
   }).isRequired,
-  index: PropTypes.number.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
   }).isRequired,
@@ -170,18 +219,17 @@ const styles = StyleSheet.create({
 const PlayerConnector = connect(state => (
   {
     event: state.event.event.data,
-    index: state.event.index,
   }
 ), dispatch => (
   {
-    stopEvent: event => (
-      dispatch(stopEventAction(event))
+    pauseEvent: event => (
+      dispatch(pauseEventAction(event))
     ),
-    increaseIndex: () => (
-      dispatch(increaseIndexAction())
+    increaseIndex: (event, index) => (
+      dispatch(increaseIndexAction(event, index))
     ),
-    resetIndex: () => (
-      dispatch(resetIndexAction())
+    clearEvent: event => (
+      dispatch(clearEventAction(event))
     ),
   }
 ))(Player);

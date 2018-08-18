@@ -9,7 +9,6 @@ const initialState = {
     lastUpdated: '',
     data: {},
   },
-  index: 0,
 };
 
 const sptAuth = (state = initialState, action) => {
@@ -57,16 +56,6 @@ const sptAuth = (state = initialState, action) => {
           lastUpdated: '',
           data: {},
         },
-      });
-
-    case 'RESET_INDEX':
-      return Object.assign({}, state, {
-        index: 0,
-      });
-
-    case 'INCREASE_INDEX':
-      return Object.assign({}, state, {
-        index: state.index + 1,
       });
 
     case 'RESET_USER_EVENTS':
