@@ -46,11 +46,14 @@ const resetSptUser = () => (
   }
 );
 
-const getTracksPagination = (next, tracks = []) => {
-  const url = next.substring(next.indexOf('v1') - 1, next.length - 1);
-  return new Promise((resolve, reject) => Spotify.sendRequest(url, 'GET', {}, true)
+const getTracksPagination = (next, offset, tracks = []) => {
+  const url = next.substring(next.indexOf('v1'), next.length - 1);
+  return new Promise((resolve, reject) => Spotify.sendRequest(url, 'GET', {
+    fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id'
+    + ',album(name,images),artists))',
+    offset,
+  }, true)
     .then((result) => {
-      console.log(result);
       tracks = Object.assign({}, tracks, result.items); // eslint-disable-line
       if (result.next) {
         getTracksPagination(result.next, tracks).then(resolve).catch(reject);
@@ -65,8 +68,9 @@ const fetchPlaylistTracks = id => (
     fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id'
     + ',album(name,images),artists))',
   }, true).then((response) => {
+    console.log(response);
     if (response.next) {
-      return getTracksPagination(response.next, response.items)
+      return getTracksPagination(response.next)
         .then(tracks => [...tracks, ...response.items], error => error);
     }
     return response;
@@ -82,7 +86,7 @@ const fetchUserPlaylists = () => (
         dispatch(receiveUserPlaylists(response.items));
         return response;
       }, (error) => {
-        dispatch(receiveUserPlaylists({}));
+        dispatch(receiveUserPlaylists([]));
         return error;
       });
   }

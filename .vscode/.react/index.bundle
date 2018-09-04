@@ -88706,15 +88706,16 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   var getTracksPagination = function getTracksPagination(next) {
     var tracks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-    var url = next.substring(next.indexOf('v1') - 1, next.length - 1);
+    var url = next.substring(next.indexOf('v1'), next.length - 1);
     return new Promise(function (resolve, reject) {
-      return _rnSpotifySdk2.default.sendRequest(url, 'GET', {}, true).then(function (result) {
+      return _rnSpotifySdk2.default.sendRequest(url, 'GET', {
+        fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id' + ',album(name,images),artists))'
+      }, true).then(function (result) {
         tracks = _extends({}, tracks, result.items);
 
         if (result.next) {
           getTracksPagination(result.next, tracks).then(resolve).catch(reject);
         } else {
-          console.log(tracks);
           resolve(tracks);
         }
       }).catch(reject);
@@ -88726,8 +88727,10 @@ __d(function (global, require, module, exports, _dependencyMap) {
       return _rnSpotifySdk2.default.sendRequest("v1/playlists/" + id + "/tracks", 'GET', {
         fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id' + ',album(name,images),artists))'
       }, true).then(function (response) {
+        console.log(response);
+
         if (response.next) {
-          return getTracksPagination(response.next, response.items).then(function (tracks) {
+          return getTracksPagination(response.next).then(function (tracks) {
             return [].concat(_toConsumableArray(tracks), _toConsumableArray(response.items));
           }, function (error) {
             return error;
@@ -88750,7 +88753,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
         dispatch(receiveUserPlaylists(response.items));
         return response;
       }, function (error) {
-        dispatch(receiveUserPlaylists({}));
+        dispatch(receiveUserPlaylists([]));
         return error;
       });
     };
