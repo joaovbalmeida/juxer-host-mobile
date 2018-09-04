@@ -15,7 +15,7 @@ import actions from '../store/actions';
 
 const {
   createEvent: createEventAction,
-  fetchPlaylist: fetchPlaylistAction,
+  fetchPlaylistTracks: fetchPlaylistTracksAction,
 } = actions;
 
 class Playlist extends Component {
@@ -26,7 +26,7 @@ class Playlist extends Component {
   constructor(props) {
     super(props);
     const playlists = props.navigation.state.params.selected.map((item) => {
-      this.props.fetchPlaylist(props.playlists.data[item].id)
+      this.props.fetchPlaylistTracks(props.playlists.data[item].id)
         .then(response => console.log(response));
       const playlist = {};
       playlist.name = props.playlists.data[item].name;
@@ -144,7 +144,7 @@ class Playlist extends Component {
 
 Playlist.propTypes = {
   createEvent: PropTypes.func.isRequired,
-  fetchPlaylist: PropTypes.func.isRequired,
+  fetchPlaylistTracks: PropTypes.func.isRequired,
   playlists: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({
       href: PropTypes.string.isRequired,
@@ -203,8 +203,8 @@ const PlaylistConnector = connect(state => (
     createEvent: event => (
       dispatch(createEventAction(event))
     ),
-    fetchPlaylist: id => (
-      dispatch(fetchPlaylistAction(id))
+    fetchPlaylistTracks: id => (
+      dispatch(fetchPlaylistTracksAction(id))
     ),
   }
 ))(Playlist);

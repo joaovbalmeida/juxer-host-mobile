@@ -46,6 +46,33 @@ const resetSptUser = () => (
   }
 );
 
+const getTracksPagination = (next, tracks = []) => {
+  const url = next.substring(next.indexOf('v1') - 1, next.length - 1);
+  return new Promise((resolve, reject) => Spotify.sendRequest(url, 'GET', {}, true)
+    .then((result) => {
+      console.log(result);
+      tracks = Object.assign({}, tracks, result.items); // eslint-disable-line
+      if (result.next) {
+        getTracksPagination(result.next, tracks).then(resolve).catch(reject);
+      } else {
+        resolve(tracks);
+      }
+    }).catch(reject));
+};
+
+const fetchPlaylistTracks = id => (
+  () => Spotify.sendRequest(`v1/playlists/${id}/tracks`, 'GET', {
+    fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id'
+    + ',album(name,images),artists))',
+  }, true).then((response) => {
+    if (response.next) {
+      return getTracksPagination(response.next, response.items)
+        .then(tracks => [...tracks, ...response.items], error => error);
+    }
+    return response;
+  }, error => error)
+);
+
 const fetchUserPlaylists = () => (
   (dispatch) => {
     dispatch(requestUserPlaylists());
@@ -59,12 +86,6 @@ const fetchUserPlaylists = () => (
         return error;
       });
   }
-);
-
-const fetchPlaylist = id => (
-  () => Spotify.sendRequest(`v1/playlists/${id}`, 'GET', {
-    fields: 'tracks.items(track(name,uri,available_markets,id,album(name,images),artists))',
-  }, true).then(response => response, error => error)
 );
 
 const fetchSptUser = () => (
@@ -140,5 +161,5 @@ export default {
   checkSptToken,
   fetchSptUser,
   fetchUserPlaylists,
-  fetchPlaylist,
+  fetchPlaylistTracks,
 };
