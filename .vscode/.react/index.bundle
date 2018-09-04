@@ -61624,7 +61624,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   }, {
     initialRouteName: 'Loading'
   });
-},525,[526,644,811,839],"juxerhost/app/routes/index.js");
+},525,[526,644,811,840],"juxerhost/app/routes/index.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = {
     get createNavigationContainer() {
@@ -80464,7 +80464,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  var socket = (0, _socket2.default)('http://10.0.1.50:3030/', {
+  var socket = (0, _socket2.default)('http://localhost:3030/', {
     transports: ['websocket'],
     forceNew: true,
     pingInterval: 10000,
@@ -88715,6 +88715,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   };
 
+  var fetchPlaylist = function fetchPlaylist(id) {
+    return function () {
+      return _rnSpotifySdk2.default.sendRequest("v1/playlists/" + id, 'GET', {
+        fields: 'tracks.items(track(name,uri,available_markets,id,album(name,images),artists))'
+      }, true).then(function (response) {
+        return response;
+      }, function (error) {
+        return error;
+      });
+    };
+  };
+
   var fetchSptUser = function fetchSptUser() {
     return function (dispatch) {
       dispatch(requestSptUser());
@@ -88784,7 +88796,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
     sptAuth: sptAuth,
     checkSptToken: checkSptToken,
     fetchSptUser: fetchSptUser,
-    fetchUserPlaylists: fetchUserPlaylists
+    fetchUserPlaylists: fetchUserPlaylists,
+    fetchPlaylist: fetchPlaylist
   };
 },728,[729],"juxerhost/app/store/actions/spotify.js");
 __d(function (global, require, module, exports, _dependencyMap) {
@@ -93922,7 +93935,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   }
 
-  var createEventAction = _actions2.default.createEvent;
+  var createEventAction = _actions2.default.createEvent,
+      fetchPlaylistAction = _actions2.default.fetchPlaylist;
 
   var Playlist = _wrapComponent("Playlist")((_temp = _class = function (_Component) {
     _inherits(Playlist, _Component);
@@ -93933,6 +93947,10 @@ __d(function (global, require, module, exports, _dependencyMap) {
       var _this = _possibleConstructorReturn(this, (Playlist.__proto__ || Object.getPrototypeOf(Playlist)).call(this, props));
 
       var playlists = props.navigation.state.params.selected.map(function (item) {
+        _this.props.fetchPlaylist(props.playlists.data[item].id).then(function (response) {
+          return console.log(response);
+        });
+
         var playlist = {};
         playlist.name = props.playlists.data[item].name;
         playlist.tracks = props.playlists.data[item].tracks.total;
@@ -93980,7 +93998,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 64
+              lineNumber: 67
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -93995,7 +94013,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   style: styles.itemContainer,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 69
+                    lineNumber: 72
                   }
                 },
                 _react3.default.createElement(_playlist2.default, {
@@ -94005,7 +94023,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   disabled: true,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 70
+                    lineNumber: 73
                   }
                 }),
                 _react3.default.createElement(
@@ -94014,7 +94032,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     style: styles.rightView,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 76
+                      lineNumber: 79
                     }
                   },
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
@@ -94048,7 +94066,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 77
+                      lineNumber: 80
                     }
                   }),
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
@@ -94081,7 +94099,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 103
+                      lineNumber: 106
                     }
                   })
                 )
@@ -94092,7 +94110,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 65
+              lineNumber: 68
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
@@ -94102,7 +94120,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 133
+              lineNumber: 136
             }
           })
         );
@@ -94118,6 +94136,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   Playlist.propTypes = {
     createEvent: _propTypes2.default.func.isRequired,
+    fetchPlaylist: _propTypes2.default.func.isRequired,
     playlists: _propTypes2.default.shape({
       data: _propTypes2.default.arrayOf(_propTypes2.default.shape({
         href: _propTypes2.default.string.isRequired,
@@ -94125,7 +94144,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
         images: _propTypes2.default.array.isRequired,
         tracks: _propTypes2.default.shape({
           total: _propTypes2.default.number.isRequired
-        }).isRequired
+        }).isRequired,
+        id: _propTypes2.default.string.isRequired
       }).isRequired).isRequired
     }).isRequired,
     navigation: _propTypes2.default.shape({
@@ -94174,6 +94194,9 @@ __d(function (global, require, module, exports, _dependencyMap) {
     return {
       createEvent: function createEvent(event) {
         return dispatch(createEventAction(event));
+      },
+      fetchPlaylist: function fetchPlaylist(id) {
+        return dispatch(fetchPlaylistAction(id));
       }
     };
   })(Playlist);
@@ -99313,10 +99336,6 @@ __d(function (global, require, module, exports, _dependencyMap) {
         }, {
           text: 'Sim',
           onPress: function onPress() {
-            _this3.setState({
-              visible: false
-            });
-
             _rnSpotifySdk2.default.setPlaying(false);
 
             _this3.props.pauseEvent(_this3.props.event._id).then(function () {
@@ -99364,14 +99383,14 @@ __d(function (global, require, module, exports, _dependencyMap) {
             style: styles.container,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 168
+              lineNumber: 167
             }
           },
           _react3.default.createElement(_reactNative.StatusBar, {
             barStyle: "light-content",
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 169
+              lineNumber: 168
             }
           }),
           _react3.default.createElement(_player2.default, {
@@ -99381,7 +99400,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 170
+              lineNumber: 169
             }
           }),
           _react3.default.createElement(_footer2.default, {
@@ -99393,7 +99412,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             pause: this.pause,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 174
+              lineNumber: 173
             }
           }),
           _react3.default.createElement(_player4.default, {
@@ -99411,7 +99430,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             playing: this.state.playing,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 182
+              lineNumber: 181
             }
           })
         );
@@ -99462,7 +99481,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Player);
   exports.default = PlayerConnector;
-},824,[109,128,12,490,292,729,825,829,835,646],"juxerhost/app/screens/player.js");
+},824,[109,128,12,490,292,729,825,830,836,646],"juxerhost/app/screens/player.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99487,7 +99506,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     initialRouteName: 'Queue'
   });
   exports.default = PlayerStack;
-},825,[526,826,828],"juxerhost/app/routes/player.js");
+},825,[526,826,829],"juxerhost/app/routes/player.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99736,7 +99755,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     return {};
   })(Queue);
   exports.default = QueueConnector;
-},826,[109,128,12,490,292,735,648,827,841],"juxerhost/app/screens/queue.js");
+},826,[109,128,12,490,292,735,648,827,828],"juxerhost/app/screens/queue.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -99894,6 +99913,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
 
   exports.default = Track;
 },827,[109,12,292],"juxerhost/app/components/track.js");
+__d(function (global, require, module, exports, _dependencyMap) {
+  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
+    "__packager_asset": true,
+    "httpServerLocation": "/assets/app/assets/images",
+    "width": 24,
+    "height": 24,
+    "scales": [1],
+    "hash": "ee27416a9189dd847f56ccb4ccfe303a",
+    "name": "clear",
+    "type": "png"
+  });
+},828,[325],"app/assets/images/clear.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -100079,7 +100110,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Settings);
   exports.default = SettingsConnector;
-},828,[109,128,12,490,292,735,648,827,646],"juxerhost/app/screens/settings.js");
+},829,[109,128,12,490,292,735,648,827,646],"juxerhost/app/screens/settings.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -100452,7 +100483,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Player;
-},829,[109,12,292,814,830,831,832,833,834],"juxerhost/app/components/player.js");
+},830,[109,12,292,814,831,832,833,834,835],"juxerhost/app/components/player.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100464,7 +100495,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "arrowDown",
     "type": "png"
   });
-},830,[325],"app/assets/images/arrowDown.png");
+},831,[325],"app/assets/images/arrowDown.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100476,7 +100507,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "pause",
     "type": "png"
   });
-},831,[325],"app/assets/images/pause.png");
+},832,[325],"app/assets/images/pause.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100488,7 +100519,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "play",
     "type": "png"
   });
-},832,[325],"app/assets/images/play.png");
+},833,[325],"app/assets/images/play.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100500,7 +100531,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "stop",
     "type": "png"
   });
-},833,[325],"app/assets/images/stop.png");
+},834,[325],"app/assets/images/stop.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100512,7 +100543,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "forward",
     "type": "png"
   });
-},834,[325],"app/assets/images/forward.png");
+},835,[325],"app/assets/images/forward.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -100703,7 +100734,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   });
 
   exports.default = Footer;
-},835,[109,12,292,836,837,838],"juxerhost/app/components/footer.js");
+},836,[109,12,292,837,838,839],"juxerhost/app/components/footer.js");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100715,7 +100746,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "miniPlay",
     "type": "png"
   });
-},836,[325],"app/assets/images/miniPlay.png");
+},837,[325],"app/assets/images/miniPlay.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100727,7 +100758,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "miniPause",
     "type": "png"
   });
-},837,[325],"app/assets/images/miniPause.png");
+},838,[325],"app/assets/images/miniPause.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -100739,7 +100770,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     "name": "arrowUp",
     "type": "png"
   });
-},838,[325],"app/assets/images/arrowUp.png");
+},839,[325],"app/assets/images/arrowUp.png");
 __d(function (global, require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -100821,8 +100852,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
           clientID: '84f3966b6522451686c303f5900fc12b',
           sessionUserDefaultsKey: 'SpotifySession',
           redirectURL: 'juxerhost://auth',
-          tokenSwapURL: 'http://10.0.1.50:3000/swap',
-          tokenRefreshURL: 'http://10.0.1.50:3000/refresh',
+          tokenSwapURL: 'http://localhost:3000/swap',
+          tokenRefreshURL: 'http://localhost:3000/refresh',
           scopes: ['user-read-private', 'user-read-email', 'playlist-read', 'playlist-read-private', 'streaming']
         };
         Promise.all([this.props.checkToken(), _rnSpotifySdk2.default.initialize(spotifyOptions)]).then(function (response) {
@@ -100913,19 +100944,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   })(Loading);
   exports.default = LoadingConnector;
-},839,[109,128,12,490,292,729,646],"juxerhost/app/screens/loading.js");
-__d(function (global, require, module, exports, _dependencyMap) {
-  module.exports = require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
-    "__packager_asset": true,
-    "httpServerLocation": "/assets/app/assets/images",
-    "width": 24,
-    "height": 24,
-    "scales": [1],
-    "hash": "ee27416a9189dd847f56ccb4ccfe303a",
-    "name": "clear",
-    "type": "png"
-  });
-},841,[325],"app/assets/images/clear.png");
+},840,[109,128,12,490,292,729,646],"juxerhost/app/screens/loading.js");
 require(23);
 require(11);
 //# sourceMappingURL=index.map

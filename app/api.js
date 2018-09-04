@@ -4,7 +4,7 @@ import auth from '@feathersjs/authentication-client';
 import io from 'socket.io-client';
 import { AsyncStorage } from 'react-native';
 
-const socket = io('http://10.0.1.50:3030/', {
+const socket = io('http://localhost:3030/', {
   transports: ['websocket'],
   forceNew: true,
   pingInterval: 10000,

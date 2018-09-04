@@ -23,8 +23,8 @@ class Loading extends Component {
       clientID: '84f3966b6522451686c303f5900fc12b',
       sessionUserDefaultsKey: 'SpotifySession',
       redirectURL: 'juxerhost://auth',
-      tokenSwapURL: 'http://10.0.1.50:3000/swap',
-      tokenRefreshURL: 'http://10.0.1.50:3000/refresh',
+      tokenSwapURL: 'http://localhost:3000/swap',
+      tokenRefreshURL: 'http://localhost:3000/refresh',
       scopes: ['user-read-private', 'user-read-email', 'playlist-read', 'playlist-read-private', 'streaming'],
     };
 

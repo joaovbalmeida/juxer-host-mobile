@@ -61,6 +61,12 @@ const fetchUserPlaylists = () => (
   }
 );
 
+const fetchPlaylist = id => (
+  () => Spotify.sendRequest(`v1/playlists/${id}`, 'GET', {
+    fields: 'tracks.items(track(name,uri,available_markets,id,album(name,images),artists))',
+  }, true).then(response => response, error => error)
+);
+
 const fetchSptUser = () => (
   (dispatch) => {
     dispatch(requestSptUser());
@@ -134,4 +140,5 @@ export default {
   checkSptToken,
   fetchSptUser,
   fetchUserPlaylists,
+  fetchPlaylist,
 };
