@@ -88648,8 +88648,6 @@ __d(function (global, require, module, exports, _dependencyMap) {
     value: true
   });
 
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
   var _rnSpotifySdk = require(_dependencyMap[0], "rn-spotify-sdk");
 
   var _rnSpotifySdk2 = _interopRequireDefault(_rnSpotifySdk);
@@ -88704,17 +88702,18 @@ __d(function (global, require, module, exports, _dependencyMap) {
     };
   };
 
-  var getTracksPagination = function getTracksPagination(next) {
-    var tracks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-    var url = next.substring(next.indexOf('v1'), next.length - 1);
+  var getTracksPagination = function getTracksPagination(id, offset) {
+    var tracks = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+    var url = "v1/playlists/" + id + "/tracks";
     return new Promise(function (resolve, reject) {
       return _rnSpotifySdk2.default.sendRequest(url, 'GET', {
-        fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id' + ',album(name,images),artists))'
+        fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id' + ',album(name,images),artists))',
+        offset: offset
       }, true).then(function (result) {
-        tracks = _extends({}, tracks, result.items);
+        tracks = [].concat(_toConsumableArray(tracks), _toConsumableArray(result.items));
 
         if (result.next) {
-          getTracksPagination(result.next, tracks).then(resolve).catch(reject);
+          getTracksPagination(id, result.offset + result.limit, tracks).then(resolve).catch(reject);
         } else {
           resolve(tracks);
         }
@@ -88727,10 +88726,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
       return _rnSpotifySdk2.default.sendRequest("v1/playlists/" + id + "/tracks", 'GET', {
         fields: 'limit,offset,total,next,previous,items(track(name,uri,available_markets,id' + ',album(name,images),artists))'
       }, true).then(function (response) {
-        console.log(response);
-
         if (response.next) {
-          return getTracksPagination(response.next).then(function (tracks) {
+          return getTracksPagination(id, response.offset + response.limit).then(function (tracks) {
             return [].concat(_toConsumableArray(tracks), _toConsumableArray(response.items));
           }, function (error) {
             return error;
@@ -93979,17 +93976,15 @@ __d(function (global, require, module, exports, _dependencyMap) {
       var _this = _possibleConstructorReturn(this, (Playlist.__proto__ || Object.getPrototypeOf(Playlist)).call(this, props));
 
       var playlists = props.navigation.state.params.selected.map(function (item) {
-        _this.props.fetchPlaylistTracks(props.playlists.data[item].id).then(function (response) {
-          return console.log(response);
-        });
-
-        var playlist = {};
-        playlist.name = props.playlists.data[item].name;
-        playlist.tracks = props.playlists.data[item].tracks.total;
-        playlist.url = props.playlists.data[item].href.replace('https://api.spotify.com/', '');
-        playlist.image = props.playlists.data[item].images[0].url;
-        playlist.start = '';
-        playlist.end = '';
+        var playlist = {
+          startDate: '',
+          endDate: '',
+          id: _this.props.playlists.data[item].id,
+          name: props.playlists.data[item].name,
+          total: props.playlists.data[item].tracks.total,
+          url: props.playlists.data[item].href.replace('https://api.spotify.com/', ''),
+          image: props.playlists.data[item].images[0].url
+        };
         return playlist;
       });
       _this.state = {
@@ -94003,12 +93998,17 @@ __d(function (global, require, module, exports, _dependencyMap) {
       value: function initEvent() {
         var _this2 = this;
 
-        var playlists = [].concat(_toConsumableArray(this.state.playlists.map(function (item) {
-          return _extends({}, item, {
+        var playlists = this.state.playlists.map(function (item) {
+          var playlist = _extends({}, item, {
             startDate: (0, _moment2.default)(item.start),
             endDate: (0, _moment2.default)(item.end)
           });
-        })));
+
+          Promise.resolve(_this2.props.fetchPlaylistTracks(item.id)).then(function (response) {
+            playlist.tracks = [].concat(_toConsumableArray(response));
+          });
+          return playlist;
+        });
         var event = {
           name: this.props.navigation.state.params.name,
           secret: this.props.navigation.state.params.secret,
@@ -94030,7 +94030,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 67
+              lineNumber: 71
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -94045,17 +94045,17 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   style: styles.itemContainer,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 72
+                    lineNumber: 76
                   }
                 },
                 _react3.default.createElement(_playlist2.default, {
                   name: item.name,
-                  qty: item.tracks.toString(),
+                  qty: item.total.toString(),
                   image: item.image,
                   disabled: true,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 73
+                    lineNumber: 77
                   }
                 }),
                 _react3.default.createElement(
@@ -94064,12 +94064,12 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     style: styles.rightView,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 79
+                      lineNumber: 83
                     }
                   },
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
                     style: styles.picker,
-                    date: _this3.state.playlists[index].start,
+                    date: _this3.state.playlists[index].startDate,
                     mode: "datetime",
                     placeholder: "In\xEDcio",
                     minDate: (0, _moment2.default)().toDate(),
@@ -94090,7 +94090,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     onDateChange: function onDateChange(start) {
                       return _this3.setState(function (state) {
                         var playlists = [].concat(_toConsumableArray(state.playlists));
-                        playlists[index].start = start;
+                        playlists[index].startDate = start;
                         return {
                           playlists: playlists
                         };
@@ -94098,12 +94098,12 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 80
+                      lineNumber: 84
                     }
                   }),
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
                     style: styles.picker,
-                    date: _this3.state.playlists[index].end,
+                    date: _this3.state.playlists[index].endDate,
                     mode: "datetime",
                     placeholder: "T\xE9rmino",
                     minDate: (0, _moment2.default)().toDate(),
@@ -94123,7 +94123,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     onDateChange: function onDateChange(end) {
                       return _this3.setState(function (state) {
                         var playlists = [].concat(_toConsumableArray(state.playlists));
-                        playlists[index].end = end;
+                        playlists[index].endDate = end;
                         return {
                           playlists: playlists
                         };
@@ -94131,7 +94131,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 106
+                      lineNumber: 110
                     }
                   })
                 )
@@ -94142,7 +94142,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 68
+              lineNumber: 72
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
@@ -94152,7 +94152,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 136
+              lineNumber: 140
             }
           })
         );

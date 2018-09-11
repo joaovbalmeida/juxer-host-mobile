@@ -26,15 +26,15 @@ class Playlist extends Component {
   constructor(props) {
     super(props);
     const playlists = props.navigation.state.params.selected.map((item) => {
-      this.props.fetchPlaylistTracks(props.playlists.data[item].id)
-        .then(response => console.log(response));
-      const playlist = {};
-      playlist.name = props.playlists.data[item].name;
-      playlist.tracks = props.playlists.data[item].tracks.total;
-      playlist.url = props.playlists.data[item].href.replace('https://api.spotify.com/', '');
-      playlist.image = props.playlists.data[item].images[0].url;
-      playlist.start = '';
-      playlist.end = '';
+      const playlist = {
+        startDate: '',
+        endDate: '',
+        id: this.props.playlists.data[item].id,
+        name: props.playlists.data[item].name,
+        total: props.playlists.data[item].tracks.total,
+        url: props.playlists.data[item].href.replace('https://api.spotify.com/', ''),
+        image: props.playlists.data[item].images[0].url,
+      };
       return playlist;
     });
 
@@ -44,12 +44,16 @@ class Playlist extends Component {
   }
 
   initEvent() {
-    const playlists = [...this.state.playlists.map(item => (
-      Object.assign({}, item, {
+    const playlists = this.state.playlists.map((item) => {
+      const playlist = Object.assign({}, item, {
         startDate: Moment(item.start),
         endDate: Moment(item.end),
-      })
-    ))];
+      });
+      Promise.resolve(this.props.fetchPlaylistTracks(item.id)).then((response) => {
+        playlist.tracks = [...response];
+      });
+      return playlist;
+    });
     const event = {
       name: this.props.navigation.state.params.name,
       secret: this.props.navigation.state.params.secret,
@@ -72,14 +76,14 @@ class Playlist extends Component {
             <View style={styles.itemContainer}>
               <PlaylistComponent
                 name={item.name}
-                qty={item.tracks.toString()}
+                qty={item.total.toString()}
                 image={item.image}
                 disabled
               />
               <View style={styles.rightView}>
                 <DatePicker
                   style={styles.picker}
-                  date={this.state.playlists[index].start}
+                  date={this.state.playlists[index].startDate}
                   mode="datetime"
                   placeholder="Início"
                   minDate={Moment().toDate()}
@@ -99,13 +103,13 @@ class Playlist extends Component {
                   }}
                   onDateChange={start => this.setState((state) => {
                     const playlists = [...state.playlists];
-                    playlists[index].start = start;
+                    playlists[index].startDate = start;
                     return { playlists };
                   })}
                 />
                 <DatePicker
                   style={styles.picker}
-                  date={this.state.playlists[index].end}
+                  date={this.state.playlists[index].endDate}
                   mode="datetime"
                   placeholder="Término"
                   minDate={Moment().toDate()}
@@ -124,7 +128,7 @@ class Playlist extends Component {
                   }}
                   onDateChange={end => this.setState((state) => {
                     const playlists = [...state.playlists];
-                    playlists[index].end = end;
+                    playlists[index].endDate = end;
                     return { playlists };
                   })}
                 />
