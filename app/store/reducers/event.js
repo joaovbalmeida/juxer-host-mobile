@@ -11,7 +11,7 @@ const initialState = {
   },
 };
 
-const sptAuth = (state = initialState, action) => {
+const event = (state = initialState, action) => {
   switch (action.type) {
     case 'REQUEST_USER_EVENTS':
       return Object.assign({}, state, {
@@ -72,4 +72,4 @@ const sptAuth = (state = initialState, action) => {
   }
 };
 
-export default sptAuth;
+export default event;

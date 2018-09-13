@@ -72,7 +72,7 @@ const fetchPlaylistTracks = id => (
       return getTracksPagination(id, response.offset + response.limit)
         .then(tracks => [...tracks, ...response.items], error => error);
     }
-    return response;
+    return response.items;
   }, error => error)
 );
 

@@ -50,8 +50,16 @@ class Playlist extends Component {
         endDate: Moment(item.end),
       });
       Promise.resolve(this.props.fetchPlaylistTracks(item.id)).then((response) => {
-        playlist.tracks = [...response];
-      });
+        playlist.tracks = response.map(e => (
+          {
+            uri: e.track.uri,
+            name: e.track.name,
+            artist: e.track.artists[0].name,
+            album: e.track.album.name,
+            cover: e.track.album.images[0].url,
+          }
+        ));
+      }, error => console.log(error));
       return playlist;
     });
     const event = {

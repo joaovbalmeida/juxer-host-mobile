@@ -17,7 +17,7 @@ const initialState = {
   },
 };
 
-const sptAuth = (state = initialState, action) => {
+const spotify = (state = initialState, action) => {
   switch (action.type) {
     case 'REQUEST_SPT_USER':
       return Object.assign({}, state, {
@@ -89,4 +89,4 @@ const sptAuth = (state = initialState, action) => {
   }
 };
 
-export default sptAuth;
+export default spotify;

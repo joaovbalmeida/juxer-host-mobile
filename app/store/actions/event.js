@@ -92,7 +92,7 @@ const fetchUserEvents = () => (
       }, (error) => {
         dispatch(receiveUserEvents([]));
         return error;
-      });
+      }, error => error);
   }
 );
 

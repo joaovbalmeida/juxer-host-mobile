@@ -88734,7 +88734,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
           });
         }
 
-        return response;
+        return response.items;
       }, function (error) {
         return error;
       });
@@ -89694,6 +89694,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
         user: _index2.default.getState().auth.user.data
       })).then(function (response) {
         dispatch(receiveEvent(response));
+        console.log(response);
 
         _api2.default.events.on('patched', updateEventCallback);
 
@@ -89724,6 +89725,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
         return response;
       }, function (error) {
         dispatch(receiveUserEvents([]));
+        return error;
+      }, function (error) {
         return error;
       });
     };
@@ -94005,7 +94008,17 @@ __d(function (global, require, module, exports, _dependencyMap) {
           });
 
           Promise.resolve(_this2.props.fetchPlaylistTracks(item.id)).then(function (response) {
-            playlist.tracks = [].concat(_toConsumableArray(response));
+            playlist.tracks = response.map(function (e) {
+              return {
+                uri: e.track.uri,
+                name: e.track.name,
+                artist: e.track.artists[0].name,
+                album: e.track.album.name,
+                cover: e.track.album.images[0].url
+              };
+            });
+          }, function (error) {
+            return console.log(error);
           });
           return playlist;
         });
@@ -94030,7 +94043,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 71
+              lineNumber: 79
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -94045,7 +94058,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   style: styles.itemContainer,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 76
+                    lineNumber: 84
                   }
                 },
                 _react3.default.createElement(_playlist2.default, {
@@ -94055,7 +94068,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   disabled: true,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 77
+                    lineNumber: 85
                   }
                 }),
                 _react3.default.createElement(
@@ -94064,7 +94077,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     style: styles.rightView,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 83
+                      lineNumber: 91
                     }
                   },
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
@@ -94098,7 +94111,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 84
+                      lineNumber: 92
                     }
                   }),
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
@@ -94131,7 +94144,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 110
+                      lineNumber: 118
                     }
                   })
                 )
@@ -94142,7 +94155,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 72
+              lineNumber: 80
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
@@ -94152,7 +94165,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 140
+              lineNumber: 148
             }
           })
         );
