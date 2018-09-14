@@ -16,6 +16,7 @@ import actions from '../store/actions';
 const {
   createEvent: createEventAction,
   fetchPlaylistTracks: fetchPlaylistTracksAction,
+  createPlaylist: createPlaylistAction,
 } = actions;
 
 class Playlist extends Component {
@@ -44,34 +45,38 @@ class Playlist extends Component {
   }
 
   initEvent() {
-    const playlists = this.state.playlists.map((item) => {
-      const playlist = Object.assign({}, item, {
-        startDate: Moment(item.start),
-        endDate: Moment(item.end),
-      });
-      Promise.resolve(this.props.fetchPlaylistTracks(item.id)).then((response) => {
-        playlist.tracks = response.map(e => (
-          {
-            uri: e.track.uri,
-            name: e.track.name,
-            artist: e.track.artists[0].name,
-            album: e.track.album.name,
-            cover: e.track.album.images[0].url,
+    const playlists = this.state.playlists.map(item => (
+      this.props.fetchPlaylistTracks(item.id).then(response => (
+        response.map(e => ({
+          uri: e.track.uri,
+          name: e.track.name,
+          artist: e.track.artists[0].name,
+          album: e.track.album.name,
+          cover: e.track.album.images[0].url,
+        }))
+      )).then(tracks => (
+        this.props.createPlaylist(Object.assign({}, item, {
+          tracks,
+          startDate: Moment(item.start),
+          endDate: Moment(item.end),
+        })).then(response => (
+          response._id // eslint-disable-line
+        ), () => false)
+      ))
+    ));
+    Promise.all(playlists).then((response) => {
+      if (!response.includes(undefined || false)) {
+        this.props.createEvent({
+          name: this.props.navigation.state.params.name,
+          secret: this.props.navigation.state.params.secret,
+          playlists: response,
+        }).then((result) => {
+          if (result._id) { // eslint-disable-line
+            this.props.navigation.navigate('Player');
           }
-        ));
-      }, error => console.log(error));
-      return playlist;
-    });
-    const event = {
-      name: this.props.navigation.state.params.name,
-      secret: this.props.navigation.state.params.secret,
-      playlists,
-    };
-    this.props.createEvent(event).then((result) => {
-      if (result._id) { // eslint-disable-line
-        this.props.navigation.navigate('Player');
+        });
       }
-    });
+    }, error => console.log(error));
   }
 
   render() {
@@ -156,6 +161,7 @@ class Playlist extends Component {
 
 Playlist.propTypes = {
   createEvent: PropTypes.func.isRequired,
+  createPlaylist: PropTypes.func.isRequired,
   fetchPlaylistTracks: PropTypes.func.isRequired,
   playlists: PropTypes.shape({
     data: PropTypes.arrayOf(PropTypes.shape({
@@ -214,6 +220,9 @@ const PlaylistConnector = connect(state => (
   {
     createEvent: event => (
       dispatch(createEventAction(event))
+    ),
+    createPlaylist: playlist => (
+      dispatch(createPlaylistAction(playlist))
     ),
     fetchPlaylistTracks: id => (
       dispatch(fetchPlaylistTracksAction(id))
