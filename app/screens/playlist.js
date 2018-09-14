@@ -45,38 +45,36 @@ class Playlist extends Component {
   }
 
   initEvent() {
-    const playlists = this.state.playlists.map(item => (
-      this.props.fetchPlaylistTracks(item.id).then(response => (
-        response.map(e => ({
-          uri: e.track.uri,
-          name: e.track.name,
-          artist: e.track.artists[0].name,
-          album: e.track.album.name,
-          cover: e.track.album.images[0].url,
-        }))
-      )).then(tracks => (
-        this.props.createPlaylist(Object.assign({}, item, {
-          tracks,
-          startDate: Moment(item.start),
-          endDate: Moment(item.end),
-        })).then(response => (
-          response._id // eslint-disable-line
-        ), () => false)
-      ))
-    ));
-    Promise.all(playlists).then((response) => {
-      if (!response.includes(undefined || false)) {
-        this.props.createEvent({
-          name: this.props.navigation.state.params.name,
-          secret: this.props.navigation.state.params.secret,
-          playlists: response,
-        }).then((result) => {
-          if (result._id) { // eslint-disable-line
-            this.props.navigation.navigate('Player');
-          }
-        });
+    this.props.createEvent({
+      name: this.props.navigation.state.params.name,
+      secret: this.props.navigation.state.params.secret,
+    }).then((result) => {
+      if (result._id) { // eslint-disable-line
+        const playlists = this.state.playlists.map(item => (
+          this.props.fetchPlaylistTracks(item.id).then(response => (
+            response.map(e => ({
+              uri: e.track.uri,
+              name: e.track.name,
+              artist: e.track.artists[0].name,
+              album: e.track.album.name,
+              cover: e.track.album.images[0].url,
+            }))
+          )).then(tracks => (
+            this.props.createPlaylist(Object.assign({}, item, {
+              tracks,
+              event: result._id, // eslint-disable-line
+              startDate: Moment(item.start),
+              endDate: Moment(item.end),
+            })).then(response => (
+              response._id // eslint-disable-line
+            ), () => false)
+          ))
+        ));
+        Promise.all(playlists).then(() => {
+          this.props.navigation.navigate('Player');
+        }, error => console.log(error));
       }
-    }, error => console.log(error));
+    });
   }
 
   render() {

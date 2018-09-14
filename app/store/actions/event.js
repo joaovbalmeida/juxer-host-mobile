@@ -58,7 +58,6 @@ const createEvent = event => (
     return api.events.create({
       name: event.name,
       secret: event.secret,
-      playlists: event.playlists,
       active: true,
     }, paramsForServer({
       user: store.getState().auth.user.data,
@@ -66,7 +65,6 @@ const createEvent = event => (
       dispatch(receiveEvent(response));
 
       api.events.on('patched', updateEventCallback);
-
       api.events.on('updated', updateEventCallback);
 
       return response;
@@ -106,7 +104,6 @@ const startEvent = event => (
       dispatch(receiveEvent(response));
 
       api.events.on('patched', updateEventCallback);
-
       api.events.on('updated', updateEventCallback);
 
       return response;
@@ -130,7 +127,6 @@ const pauseEvent = event => (
     dispatch(resetEvent());
 
     api.events.removeListener('patched', updateEventCallback);
-
     api.events.removeListener('updated', updateEventCallback);
 
     return api.events.patch(event, { active: false }, paramsForServer({

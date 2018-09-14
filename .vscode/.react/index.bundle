@@ -89692,7 +89692,6 @@ __d(function (global, require, module, exports, _dependencyMap) {
       return _api2.default.events.create({
         name: event.name,
         secret: event.secret,
-        playlists: event.playlists,
         active: true
       }, (0, _feathersHooksCommon.paramsForServer)({
         user: _index2.default.getState().auth.user.data
@@ -93221,7 +93220,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
         name: playlist.name,
         image: playlist.image,
         total: playlist.total,
-        tracks: playlist.tracks
+        tracks: playlist.tracks,
+        event: playlist.event
       }, (0, _feathersHooksCommon.paramsForServer)({
         user: _index2.default.getState().auth.user.data
       })).then(function (response) {
@@ -94145,43 +94145,42 @@ __d(function (global, require, module, exports, _dependencyMap) {
       value: function initEvent() {
         var _this2 = this;
 
-        var playlists = this.state.playlists.map(function (item) {
-          return _this2.props.fetchPlaylistTracks(item.id).then(function (response) {
-            return response.map(function (e) {
-              return {
-                uri: e.track.uri,
-                name: e.track.name,
-                artist: e.track.artists[0].name,
-                album: e.track.album.name,
-                cover: e.track.album.images[0].url
-              };
+        this.props.createEvent({
+          name: this.props.navigation.state.params.name,
+          secret: this.props.navigation.state.params.secret
+        }).then(function (result) {
+          if (result._id) {
+            var playlists = _this2.state.playlists.map(function (item) {
+              return _this2.props.fetchPlaylistTracks(item.id).then(function (response) {
+                return response.map(function (e) {
+                  return {
+                    uri: e.track.uri,
+                    name: e.track.name,
+                    artist: e.track.artists[0].name,
+                    album: e.track.album.name,
+                    cover: e.track.album.images[0].url
+                  };
+                });
+              }).then(function (tracks) {
+                return _this2.props.createPlaylist(_extends({}, item, {
+                  tracks: tracks,
+                  event: result._id,
+                  startDate: (0, _moment2.default)(item.start),
+                  endDate: (0, _moment2.default)(item.end)
+                })).then(function (response) {
+                  return response._id;
+                }, function () {
+                  return false;
+                });
+              });
             });
-          }).then(function (tracks) {
-            return _this2.props.createPlaylist(_extends({}, item, {
-              tracks: tracks,
-              startDate: (0, _moment2.default)(item.start),
-              endDate: (0, _moment2.default)(item.end)
-            })).then(function (response) {
-              return response._id;
-            }, function () {
-              return false;
-            });
-          });
-        });
-        Promise.all(playlists).then(function (response) {
-          if (!response.includes(undefined || false)) {
-            _this2.props.createEvent({
-              name: _this2.props.navigation.state.params.name,
-              secret: _this2.props.navigation.state.params.secret,
-              playlists: response
-            }).then(function (result) {
-              if (result._id) {
-                _this2.props.navigation.navigate('Player');
-              }
+
+            Promise.all(playlists).then(function () {
+              _this2.props.navigation.navigate('Player');
+            }, function (error) {
+              return console.log(error);
             });
           }
-        }, function (error) {
-          return console.log(error);
         });
       }
     }, {
@@ -94194,7 +94193,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 84
+              lineNumber: 82
             }
           },
           _react3.default.createElement(_reactNative.FlatList, {
@@ -94209,7 +94208,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   style: styles.itemContainer,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 89
+                    lineNumber: 87
                   }
                 },
                 _react3.default.createElement(_playlist2.default, {
@@ -94219,7 +94218,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                   disabled: true,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 90
+                    lineNumber: 88
                   }
                 }),
                 _react3.default.createElement(
@@ -94228,7 +94227,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     style: styles.rightView,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 96
+                      lineNumber: 94
                     }
                   },
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
@@ -94262,7 +94261,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 97
+                      lineNumber: 95
                     }
                   }),
                   _react3.default.createElement(_reactNativeDatepicker2.default, {
@@ -94295,7 +94294,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 123
+                      lineNumber: 121
                     }
                   })
                 )
@@ -94306,7 +94305,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 85
+              lineNumber: 83
             }
           }),
           _react3.default.createElement(_reactNative.Button, {
@@ -94316,7 +94315,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 153
+              lineNumber: 151
             }
           })
         );

@@ -32,6 +32,7 @@ const createPlaylist = playlist => (
       image: playlist.image,
       total: playlist.total,
       tracks: playlist.tracks,
+      event: playlist.event,
     }, paramsForServer({
       user: store.getState().auth.user.data,
     })).then((response) => {
