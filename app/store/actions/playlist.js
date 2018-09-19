@@ -26,14 +26,7 @@ const createPlaylist = playlist => (
   (dispatch) => {
     dispatch(requestPlaylist());
 
-    return api.playlists.create({
-      url: playlist.url,
-      name: playlist.name,
-      image: playlist.image,
-      total: playlist.total,
-      tracks: playlist.tracks,
-      event: playlist.event,
-    }, paramsForServer({
+    return api.playlists.create(playlist, paramsForServer({
       user: store.getState().auth.user.data,
     })).then((response) => {
       dispatch(receivePlaylist(response));
@@ -50,7 +43,6 @@ const fetchPlaylist = playlist => (
     dispatch(requestPlaylist());
 
     return api.events.get(playlist).then((response) => {
-      console.log(response);
       dispatch(receivePlaylist(response));
       return response;
     }, (error) => {

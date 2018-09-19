@@ -63,8 +63,8 @@ class Playlist extends Component {
             this.props.createPlaylist(Object.assign({}, item, {
               tracks,
               event: result._id, // eslint-disable-line
-              startDate: Moment(item.start),
-              endDate: Moment(item.end),
+              startDate: Moment(item.startDate),
+              endDate: Moment(item.endDate),
             })).then(response => (
               response._id // eslint-disable-line
             ), () => false)

@@ -93215,14 +93215,7 @@ __d(function (global, require, module, exports, _dependencyMap) {
   var createPlaylist = function createPlaylist(playlist) {
     return function (dispatch) {
       dispatch(requestPlaylist());
-      return _api2.default.playlists.create({
-        url: playlist.url,
-        name: playlist.name,
-        image: playlist.image,
-        total: playlist.total,
-        tracks: playlist.tracks,
-        event: playlist.event
-      }, (0, _feathersHooksCommon.paramsForServer)({
+      return _api2.default.playlists.create(playlist, (0, _feathersHooksCommon.paramsForServer)({
         user: _index2.default.getState().auth.user.data
       })).then(function (response) {
         dispatch(receivePlaylist(response));
@@ -94165,8 +94158,8 @@ __d(function (global, require, module, exports, _dependencyMap) {
                 return _this2.props.createPlaylist(_extends({}, item, {
                   tracks: tracks,
                   event: result._id,
-                  startDate: (0, _moment2.default)(item.start),
-                  endDate: (0, _moment2.default)(item.end)
+                  startDate: (0, _moment2.default)(item.startDate),
+                  endDate: (0, _moment2.default)(item.endDate)
                 })).then(function (response) {
                   return response._id;
                 }, function () {
