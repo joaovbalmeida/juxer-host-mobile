@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/es/integration/react';
-import { YellowBox } from 'react-native';
+import { YellowBox, StatusBar } from 'react-native';
 
 import Navigation from './app/routes/index';
 import store from './app/store';
@@ -15,6 +15,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
+        <StatusBar barStyle="light-content" />
         <Navigation />
       </PersistGate>
     </Provider>

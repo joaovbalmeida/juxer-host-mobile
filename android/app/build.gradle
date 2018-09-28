@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-linear-gradient')
     compile project(':rn-spotify-sdk')
     compile project(':react-native-events')
     compile project(':rn-spotify-sdk')

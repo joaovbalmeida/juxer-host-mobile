@@ -2,16 +2,13 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Button,
   FlatList,
   TouchableOpacity,
   Image,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { paramsForServer } from 'feathers-hooks-common';
 
-import api from '../api';
 import Track from '../components/track';
 import Clear from '../assets/images/clear.png';
 
@@ -69,19 +66,6 @@ class Queue extends Component {
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           keyExtractor={item => item._id} // eslint-disable-line
         />
-        <Button
-          title="Adicionar musica teste"
-          onPress={() => {
-            api.events.patch(this.props.event._id, { $push: { queue: {
-              name: 'Mr Blue Sky',
-              album: 'Out of the Blue',
-              artist: 'Electric Light Orchestra',
-              cover: 'https://i.scdn.co/image/1c4bacfab0e2fc59ea1f400bac4b57d9382476f5',
-              owner: 'joaovbalmeida',
-              uri: 'spotify:track:0mBe4dWMRLXvrAs8ixpmbp',
-            }}}, paramsForServer({ user: this.props.user }));
-          }}
-        />
       </View>
     );
   }
@@ -93,7 +77,6 @@ Queue.propTypes = {
     index: PropTypes.number,
     name: PropTypes.string,
   }).isRequired,
-  user: PropTypes.shape({}).isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
     setParams: PropTypes.func.isRequired,
@@ -120,7 +103,6 @@ const styles = StyleSheet.create({
 const QueueConnector = connect(state => (
   {
     event: state.event.event.data,
-    user: state.auth.user.data,
   }
 ), () => (
   {

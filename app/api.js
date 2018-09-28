@@ -4,7 +4,7 @@ import auth from '@feathersjs/authentication-client';
 import io from 'socket.io-client';
 import { AsyncStorage } from 'react-native';
 
-const socket = io('http://localhost:3030/', {
+const socket = io('http://juxer.herokuapp.com/', {
   transports: ['websocket'],
   forceNew: true,
   pingInterval: 10000,

@@ -18,13 +18,17 @@ const {
 } = actions;
 
 class Loading extends Component {
+  static navigationOptions = () => ({
+    header: null,
+  });
+
   componentDidMount() {
     const spotifyOptions = {
       clientID: '84f3966b6522451686c303f5900fc12b',
       sessionUserDefaultsKey: 'SpotifySession',
       redirectURL: 'juxerhost://auth',
-      tokenSwapURL: 'http://localhost:3000/swap',
-      tokenRefreshURL: 'http://localhost:3000/refresh',
+      tokenSwapURL: 'https://juxer-spotify.herokuapp.com/swap',
+      tokenRefreshURL: 'https://juxer-spotify.herokuapp.com/refresh',
       scopes: ['user-read-private', 'user-read-email', 'playlist-read', 'playlist-read-private', 'streaming'],
     };
 
