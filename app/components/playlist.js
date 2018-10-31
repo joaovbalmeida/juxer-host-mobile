@@ -33,17 +33,17 @@ const Playlist = ({
           ? (
             <ImageBackground style={styles.imageSelected}>
               <Image
-                style={{ height: 50, width: 50 }}
+                style={{ height: 50, width: 69 }}
                 source={tickIcon}
               />
             </ImageBackground>
           ) : null
       }
     </ImageBackground>
-    <Text>
+    <Text style={styles.text}>
       {name}
     </Text>
-    <Text>
+    <Text style={styles.text}>
       {`${qty} `}
       Músicas
     </Text>
@@ -68,7 +68,8 @@ Playlist.defaultProps = {
 const styles = StyleSheet.create({
   container: {
     width: 180,
-    height: '100%',
+    height: 220,
+    paddingVertical: 10,
     justifyContent: 'space-around',
     alignItems: 'center',
   },
@@ -82,6 +83,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,.7)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  text: {
+    color: 'white',
+    fontFamily: 'Raleway',
   },
 });
 

@@ -2,15 +2,21 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Button,
+  TouchableOpacity,
   FlatList,
+  Image,
+  ScrollView,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import NewEvent from '../assets/images/newEvent.png';
+import Logout from '../assets/images/logout.png';
 import Placeholder from '../assets/images/coverPlaceholder.png';
 import Playlist from '../components/playlist';
 import Event from '../components/event';
+import HeaderTitle from '../components/headerTitle';
+import Subtitle from '../components/subtitle';
 import actions from '../store/actions';
 
 const {
@@ -23,45 +29,76 @@ const {
 
 class Home extends Component {
   static navigationOptions = ({ navigation }) => ({
-    title: 'Juxer',
+    headerTitle: <HeaderTitle title="JUXER" />,
+    headerLeft: (
+      <TouchableOpacity
+        style={{ ...styles.button, marginLeft: 5 }}
+        onPress={() => navigation.state.params.logout()}
+      >
+        <Image source={Logout} style={{ height: 20, width: 18.6 }} />
+      </TouchableOpacity>
+    ),
     headerRight: (
-      <Button
+      <TouchableOpacity
+        style={{ ...styles.button, marginRight: 5 }}
         onPress={() => navigation.navigate('Event')}
-        title="Criar Evento"
-      />
+      >
+        <Image source={NewEvent} style={{ height: 20, width: 20 }} />
+      </TouchableOpacity>
     ),
   });
+
+  constructor(props) {
+    super(props);
+    this.logout = this.logout.bind(this);
+  }
 
   componentDidMount() {
     if (this.props.event.length) {
       this.props.navigation.navigate('Player');
     } else {
+      this.props.navigation.setParams({
+        logout: this.logout,
+      });
       this.props.fetchUserPlaylists();
       this.props.fetchUserEvents();
     }
   }
 
+  logout() {
+    Promise.all([
+      this.props.logout(),
+      this.props.sptLogout(),
+    ]).then(() => {
+      this.props.navigation.navigate('Loading');
+    });
+  }
+
   render() {
     return (
-      <View>
-        <FlatList
-          style={styles.playlists}
-          data={this.props.playlists.data}
-          renderItem={({ item }) => (
-            <Playlist
-              name={item.name}
-              qty={item.tracks.total.toString()}
-              image={item.images.length ? item.images[0].url : Placeholder}
-            />
-          )}
-          keyExtractor={item => item.id}
-          horizontal
-        />
-        <FlatList
-          style={styles.events}
-          data={this.props.events.data}
-          renderItem={({ item }) => (
+      <ScrollView style={styles.container}>
+        <View>
+          <Subtitle subtitle="PLAYLISTS RAPIDAS" />
+          <FlatList
+            style={styles.playlists}
+            data={this.props.playlists.data}
+            renderItem={({ item }) => (
+              <Playlist
+                name={item.name}
+                qty={item.tracks.total.toString()}
+                image={item.images.length ? item.images[0].url : Placeholder}
+              />
+            )}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            horizontal
+          />
+        </View>
+        <Subtitle subtitle="ULTIMOS EVENTOS" />
+        {
+          this.props.events.data.map(item => (
             <Event
+              key={item._id} // eslint-disable-line
               name={item.name}
               id={item._id} // eslint-disable-line
               onPress={() => {
@@ -72,24 +109,33 @@ class Home extends Component {
                 });
               }}
             />
-          )}
-          keyExtractor={item => item._id} // eslint-disable-line
-        />
-        <Button
-          title="logout"
-          onPress={() => {
-            Promise.all([
-              this.props.logout(),
-              this.props.sptLogout(),
-            ]).then(() => {
-              this.props.navigation.navigate('Loading');
-            });
-          }}
-        />
-      </View>
+          ))
+        }
+      </ScrollView>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0E1214',
+  },
+  playlists: {
+    height: 220,
+  },
+  events: {
+    flex: 1,
+    borderTopWidth: 1,
+    borderTopColor: '#15191B',
+  },
+  button: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    width: 40,
+  },
+});
 
 Home.propTypes = {
   playlists: PropTypes.shape({
@@ -108,16 +154,9 @@ Home.propTypes = {
   startEvent: PropTypes.func.isRequired,
   navigation: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
+    setParams: PropTypes.func.isRequired,
   }).isRequired,
 };
-
-const styles = StyleSheet.create({
-  playlists: {
-    height: 200,
-    width: '100%',
-    paddingVertical: 5,
-  },
-});
 
 const HomeConnector = connect(state => (
   {

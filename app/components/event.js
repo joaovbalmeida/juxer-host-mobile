@@ -3,26 +3,31 @@ import {
   Text,
   StyleSheet,
   View,
-  TouchableWithoutFeedback,
+  TouchableHighlight,
+  Image,
 } from 'react-native';
 import PropTypes from 'prop-types';
+
+import ArrowRight from '../assets/images/arrowRight.png';
 
 const Event = ({
   name,
   onPress,
 }) => (
-  <TouchableWithoutFeedback
+  <TouchableHighlight
     style={styles.container}
+    underlayColor="#1e2326"
     onPress={onPress}
   >
     <View
       style={styles.view}
     >
-      <Text>
+      <Text style={styles.text}>
         {name}
       </Text>
+      <Image source={ArrowRight} style={styles.arrow} />
     </View>
-  </TouchableWithoutFeedback>
+  </TouchableHighlight>
 );
 
 Event.propTypes = {
@@ -36,13 +41,26 @@ Event.defaultProps = {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: '100%',
   },
   view: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: 'row',
+    height: 50,
     width: '100%',
-    height: 80,
+    backgroundColor: '#0E1214',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  text: {
+    fontFamily: 'Raleway',
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'white',
+  },
+  arrow: {
+    width: 8.6,
+    height: 16,
   },
 });
 

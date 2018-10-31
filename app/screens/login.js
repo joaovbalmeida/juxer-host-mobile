@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import LinearGradient from 'react-native-linear-gradient';
 
 import sptLogo from '../assets/images/sptLogo.png';
+import logo from '../assets/images/logo.png';
 import actions from '../store/actions';
 
 const {
@@ -30,25 +31,23 @@ class Login extends Component {
     this.props.sptAuth().then((result) => {
       if (result.refreshToken) {
         this.props.fetchSptUser().then((user) => {
-          if (user.product === 'premium') {
-            this.props.auth().then((response) => {
-              if (response.accessToken) {
-                const credentials = {
-                  email: user.email,
-                  name: user.display_name,
-                  picture: user.images.length ? user.images[0].url : null,
-                  spotifyId: user.id,
-                };
-                this.props.fetchUser(credentials).then((data) => {
-                  if (data.createdAt || data.data.length) {
-                    this.props.navigation.navigate('App');
-                  } else {
-                    Alert.alert('Erro', 'Não foi possivel fazer login com esse email.');
-                  }
-                });
-              }
-            });
-          }
+          this.props.auth().then((response) => {
+            if (response.accessToken) {
+              const credentials = {
+                email: user.email,
+                name: user.display_name,
+                picture: user.images.length ? user.images[0].url : null,
+                spotifyId: user.id,
+              };
+              this.props.fetchUser(credentials).then((data) => {
+                if (data.createdAt || data.data.length) {
+                  this.props.navigation.navigate('App');
+                } else {
+                  Alert.alert('Erro', 'Não foi possivel fazer login com esse email.');
+                }
+              });
+            }
+          });
         });
       }
     }).catch((error) => {
@@ -63,15 +62,13 @@ class Login extends Component {
           <Text style={styles.title}>
             JUXER
           </Text>
+          <Image source={logo} style={styles.logo} />
           <View style={styles.middle}>
             <Text style={styles.subtitle}>
-              Seja bem-vindo ao mais novo jukebox virtual
+              Seja bem-vindo!
             </Text>
             <Text style={styles.welcome}>
-            Falta pouco para começar a montar seu evento com suas playlists personalizadas.
-            </Text>
-            <Text style={styles.welcome}>
-            Faça login com sua conta do Spotify para nos dar acesso a suas playlists.
+              Faça login com sua conta do Spotify para criar seu jukebox virtual.
             </Text>
           </View>
           <TouchableHighlight
@@ -98,9 +95,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   middle: {
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    height: '40%',
   },
   title: {
     fontFamily: 'Raleway',
@@ -111,13 +107,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontFamily: 'Raleway',
     color: 'white',
-    fontSize: 25,
+    fontSize: 20,
     textAlign: 'center',
+    fontWeight: '600',
+    paddingBottom: 5,
   },
   welcome: {
     fontFamily: 'Raleway',
     color: 'white',
-    fontSize: 17,
+    fontSize: 15,
     textAlign: 'center',
   },
   button: {
@@ -131,6 +129,10 @@ const styles = StyleSheet.create({
   buttonImage: {
     width: 100,
     height: 30,
+  },
+  logo: {
+    width: 100,
+    height: 142,
   },
 });
 

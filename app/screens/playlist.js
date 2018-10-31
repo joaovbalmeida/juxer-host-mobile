@@ -4,12 +4,16 @@ import {
   View,
   Button,
   FlatList,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-native-datepicker';
 import Moment from 'moment';
 
+import ArrowLeft from '../assets/images/arrowLeft.png';
+import HeaderTitle from '../components/headerTitle';
 import PlaylistComponent from '../components/playlist';
 import actions from '../store/actions';
 
@@ -20,8 +24,16 @@ const {
 } = actions;
 
 class Playlist extends Component {
-  static navigationOptions = () => ({
-    title: 'Playlists',
+  static navigationOptions = ({ navigation }) => ({
+    headerTitle: <HeaderTitle title="Playlists" />,
+    headerLeft: (
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.goBack()}
+      >
+        <Image source={ArrowLeft} style={styles.arrowLeft} />
+      </TouchableOpacity>
+    ),
   });
 
   constructor(props) {
@@ -157,6 +169,42 @@ class Playlist extends Component {
   }
 }
 
+const styles = StyleSheet.create({
+  playlists: {
+    height: '80%',
+    width: '100%',
+    paddingVertical: 5,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    height: 200,
+    width: '100%',
+  },
+  rightView: {
+    flex: 1,
+    paddingRight: 10,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingBottom: 50,
+  },
+  picker: {
+    height: 40,
+    width: '100%',
+    borderColor: 'gray',
+    borderWidth: 1,
+  },
+  arrowLeft: {
+    height: 16,
+    width: 8.6,
+  },
+  button: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    width: 40,
+  },
+});
+
 Playlist.propTypes = {
   createEvent: PropTypes.func.isRequired,
   createPlaylist: PropTypes.func.isRequired,
@@ -183,32 +231,6 @@ Playlist.propTypes = {
     }).isRequired,
   }).isRequired,
 };
-
-const styles = StyleSheet.create({
-  playlists: {
-    height: '80%',
-    width: '100%',
-    paddingVertical: 5,
-  },
-  itemContainer: {
-    flexDirection: 'row',
-    height: 200,
-    width: '100%',
-  },
-  rightView: {
-    flex: 1,
-    paddingRight: 10,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingBottom: 50,
-  },
-  picker: {
-    height: 40,
-    width: '100%',
-    borderColor: 'gray',
-    borderWidth: 1,
-  },
-});
 
 const PlaylistConnector = connect(state => (
   {

@@ -10,6 +10,14 @@ const EventsStack = createStackNavigator({
   Playlist: PlaylistScreen,
 }, {
   initialRouteName: 'Home',
+  navigationOptions: {
+    headerTintColor: '#ff005a',
+    headerStyle: {
+      backgroundColor: '#0E1214',
+      borderBottomWidth: 1,
+      borderBottomColor: '#15191B',
+    },
+  },
 });
 
 export default EventsStack;
